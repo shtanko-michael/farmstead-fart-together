@@ -65,7 +65,7 @@
 
 ## 5. Конфиг
 
-### `fart_together-client.toml`
+### `farmstead-fart_together-client.toml`
 
 | Ключ | По умолчанию | Описание |
 | --- | --- | --- |
@@ -80,7 +80,7 @@
 | `anim.firstPersonShake` | true | Тряска камеры в первом лице |
 | `streamerSafe` | false | Заменяет звуки на «пуф» — для эфиров с требованиями площадок |
 
-### `fart_together-server.toml`
+### `farmstead-fart_together-server.toml`
 
 | Ключ | По умолчанию | Описание |
 | --- | --- | --- |
