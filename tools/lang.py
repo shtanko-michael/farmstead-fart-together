@@ -467,6 +467,11 @@ T = {
     ],
 }
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lang_more import TABLE as _MORE  # noqa: E402
+
+T.update(_MORE)
+
 PH = re.compile(r"%(?:\d+\$)?[sd]")
 
 
