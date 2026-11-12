@@ -96,7 +96,52 @@
           "prompt": "A thin squeaky toot from a rubber balloon, rising in pitch at the end. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.2,
           "requestedSeconds": 1.2,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "squeaky/squeaky-6.ogg",
+          "mp3": "squeaky/squeaky-6.mp3",
+          "prompt": "A short high-pitched squeaky fart, tight and whiny, rising at the end. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.2,
+          "requestedSeconds": 1.2,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "squeaky/squeaky-7.ogg",
+          "mp3": "squeaky/squeaky-7.mp3",
+          "prompt": "A squeaky little fart, a thin high squeal of escaping gas. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.2,
+          "requestedSeconds": 1.2,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "squeaky/squeaky-8.ogg",
+          "mp3": "squeaky/squeaky-8.mp3",
+          "prompt": "A high squeaky fart that wobbles in pitch, funny and quick. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.2,
+          "requestedSeconds": 1.2,
+          "credits": 24
+        },
+        {
+          "take": 9,
+          "file": "squeaky/squeaky-9.ogg",
+          "mp3": "squeaky/squeaky-9.mp3",
+          "prompt": "A sharp squeaky fart, a short high-pitched 'pweee'. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.2,
+          "requestedSeconds": 1.2,
+          "credits": 0
+        },
+        {
+          "take": 10,
+          "file": "squeaky/squeaky-10.ogg",
+          "mp3": "squeaky/squeaky-10.mp3",
+          "prompt": "A squeaky fart squeezed out slowly, high and thin. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.2,
+          "requestedSeconds": 1.2,
+          "credits": 0
         }
       ]
     },
@@ -196,7 +241,52 @@
           "prompt": "A long slow balloon deflating with a wavering rubbery tone, ending with a tiny squeak. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 2.48,
           "requestedSeconds": 2.5,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "long/long-6.ogg",
+          "mp3": "long/long-6.mp3",
+          "prompt": "A long drawn-out fart, about two seconds, wavering in pitch and slowly trailing off. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 2.48,
+          "requestedSeconds": 2.5,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "long/long-7.ogg",
+          "mp3": "long/long-7.mp3",
+          "prompt": "A long rumbling fart that goes on and on, changing pitch, ending with a little sputter. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 2.48,
+          "requestedSeconds": 2.5,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "long/long-8.ogg",
+          "mp3": "long/long-8.mp3",
+          "prompt": "A long slow fart with a vibrating flutter, fading out at the end. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 2.48,
+          "requestedSeconds": 2.5,
+          "credits": 0
+        },
+        {
+          "take": 9,
+          "file": "long/long-9.ogg",
+          "mp3": "long/long-9.mp3",
+          "prompt": "A very long squeaky-to-low fart, sliding down in pitch over two seconds. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 2.48,
+          "requestedSeconds": 2.5,
+          "credits": 0
+        },
+        {
+          "take": 10,
+          "file": "long/long-10.ogg",
+          "mp3": "long/long-10.mp3",
+          "prompt": "A long sputtering fart with several bursts at the end. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 2.38,
+          "requestedSeconds": 2.5,
+          "credits": 0
         }
       ]
     },
@@ -296,7 +386,52 @@
           "prompt": "A very small soft peep of air from a squeezed rubber duck, cute and quiet. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 0.8,
           "requestedSeconds": 0.8,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "tiny/tiny-6.ogg",
+          "mp3": "tiny/tiny-6.mp3",
+          "prompt": "A tiny short fart, a quick quiet 'pfft'. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.8,
+          "requestedSeconds": 0.8,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "tiny/tiny-7.ogg",
+          "mp3": "tiny/tiny-7.mp3",
+          "prompt": "A very small soft fart, one short little toot. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.8,
+          "requestedSeconds": 0.8,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "tiny/tiny-8.ogg",
+          "mp3": "tiny/tiny-8.mp3",
+          "prompt": "A tiny squeaky fart, very short and quiet. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.8,
+          "requestedSeconds": 0.8,
+          "credits": 0
+        },
+        {
+          "take": 9,
+          "file": "tiny/tiny-9.ogg",
+          "mp3": "tiny/tiny-9.mp3",
+          "prompt": "A small quick fart, a single tiny pop of air. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.8,
+          "requestedSeconds": 0.8,
+          "credits": 0
+        },
+        {
+          "take": 10,
+          "file": "tiny/tiny-10.ogg",
+          "mp3": "tiny/tiny-10.mp3",
+          "prompt": "A tiny polite fart, barely audible, short. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.8,
+          "requestedSeconds": 0.8,
+          "credits": 0
         }
       ]
     },
@@ -396,16 +531,62 @@
           "prompt": "A soft short whoosh of air from a small bellows, gentle and clean. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 0.88,
           "requestedSeconds": 0.9,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "puff/puff-6.ogg",
+          "mp3": "puff/puff-6.mp3",
+          "prompt": "A soft silent-but-deadly fart, a quiet airy hiss of gas with no tone. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.88,
+          "requestedSeconds": 0.9,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "puff/puff-7.ogg",
+          "mp3": "puff/puff-7.mp3",
+          "prompt": "A gentle muffled fart, soft and airy, more breath than sound. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.88,
+          "requestedSeconds": 0.9,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "puff/puff-8.ogg",
+          "mp3": "puff/puff-8.mp3",
+          "prompt": "A quiet airy fart, a short soft 'pffff' of escaping air. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.88,
+          "requestedSeconds": 0.9,
+          "credits": 0
+        },
+        {
+          "take": 9,
+          "file": "puff/puff-9.ogg",
+          "mp3": "puff/puff-9.mp3",
+          "prompt": "A soft muffled fart through clothes, low and breathy, very quiet. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.88,
+          "requestedSeconds": 0.9,
+          "credits": 0
+        },
+        {
+          "take": 10,
+          "file": "puff/puff-10.ogg",
+          "mp3": "puff/puff-10.mp3",
+          "prompt": "A barely audible airy fart, a soft whisper of gas. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 0.84,
+          "requestedSeconds": 0.9,
+          "credits": 0
         }
       ]
     }
   },
-  "note": "Choose one take per slot, then set it in art/sounds/slots.json and run `python -I tools/sounds.py install`. Takes 1-4 share a prompt (different seeds), take 5 is a variation. Per-take credits are not reported by the CLI and the subscription counter lags, so only totals are known: the eight take-5 generations moved it 15124 -> 15331 (207 credits, ~26 per take); all 40 takes cost about 1,050 credits (estimate from that rate).",
+  "note": "Choose one take per slot, then set it in art/sounds/slots.json and run `python -I tools/sounds.py install`. Takes 1-4 share a prompt (different seeds), take 5 is a variation. credits = the subscription's character count before/after the call; null means it was not measured (generated before measuring was added).",
   "credits": {
     "measuredTake5": 207,
     "estimatedAll40": 1050,
     "subscriptionUsedAfter": 15331,
     "subscriptionLimit": 45926
-  }
+  },
+  "creditsMeasured": 24
 }

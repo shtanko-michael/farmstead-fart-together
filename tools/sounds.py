@@ -33,6 +33,40 @@ SLOTS_FILE = ROOT / "art" / "sounds" / "slots.json"
 OUT = ROOT / "src" / "main" / "resources" / "assets" / "farmstead_fart_together" / "sounds" / "toot"
 
 STYLE = "cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter"
+# Second round (takes 6-10) for the slots the owner found too far from the real thing: a fart, not a toy.
+STYLE_V2 = "realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds"
+
+# slot: the second round's prompts, one per take 6-10
+V2: dict[str, list[str]] = {
+    "squeaky": [
+        "A short high-pitched squeaky fart, tight and whiny, rising at the end",
+        "A squeaky little fart, a thin high squeal of escaping gas",
+        "A high squeaky fart that wobbles in pitch, funny and quick",
+        "A sharp squeaky fart, a short high-pitched 'pweee'",
+        "A squeaky fart squeezed out slowly, high and thin",
+    ],
+    "long": [
+        "A long drawn-out fart, about two seconds, wavering in pitch and slowly trailing off",
+        "A long rumbling fart that goes on and on, changing pitch, ending with a little sputter",
+        "A long slow fart with a vibrating flutter, fading out at the end",
+        "A very long squeaky-to-low fart, sliding down in pitch over two seconds",
+        "A long sputtering fart with several bursts at the end",
+    ],
+    "tiny": [
+        "A tiny short fart, a quick quiet 'pfft'",
+        "A very small soft fart, one short little toot",
+        "A tiny squeaky fart, very short and quiet",
+        "A small quick fart, a single tiny pop of air",
+        "A tiny polite fart, barely audible, short",
+    ],
+    "puff": [
+        "A soft silent-but-deadly fart, a quiet airy hiss of gas with no tone",
+        "A gentle muffled fart, soft and airy, more breath than sound",
+        "A quiet airy fart, a short soft 'pffff' of escaping air",
+        "A soft muffled fart through clothes, low and breathy, very quiet",
+        "A barely audible airy fart, a soft whisper of gas",
+    ],
+}
 
 # slot: purpose, target seconds, prompts (take n uses prompts[min(n, len) - 1]: takes 1-4 share the first prompt
 # with different seeds, take 5 is a variation)
@@ -90,6 +124,8 @@ def used_credits() -> int | None:
 
 
 def prompt_for(slot: str, n: int) -> str:
+    if n >= 6 and slot in V2:
+        return f"{V2[slot][(n - 6) % len(V2[slot])]}. {STYLE_V2}."
     prompts = SLOTS[slot]["prompts"]
     return f"{prompts[min(n, len(prompts)) - 1] if n >= 5 else prompts[0]}. {STYLE}."
 
