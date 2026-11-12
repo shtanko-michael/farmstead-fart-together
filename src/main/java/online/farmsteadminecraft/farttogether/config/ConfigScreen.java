@@ -35,10 +35,10 @@ public class ConfigScreen extends Screen {
     private static final String ABOUT = "about";
 
     /** What the About tab and the bottom row show besides the values; {@code tabs} come before the sections. */
-    public record Extras(String name, String version, Supplier<String> latest, List<Link> links, Runnable tryIt,
+    public record Extras(String name, String version, Supplier<String> latest, Supplier<String> source, List<Link> links, Runnable tryIt,
                          List<CustomTab> tabs) {
         public Extras(String name, String version, Supplier<String> latest, List<Link> links, Runnable tryIt) {
-            this(name, version, latest, links, tryIt, List.of());
+            this(name, version, latest, () -> null, links, tryIt, List.of());
         }
     }
 
@@ -183,11 +183,17 @@ public class ConfigScreen extends Screen {
         addRenderableWidget(centered(0, y, width, Component.literal(extras.name() + " " + extras.version())));
         String latest = extras.latest().get();
         Component status = latest == null
-            ? text("about.unknown", "Update check: not done (switched off, or no answer from Modrinth)")
+            ? text("about.unknown", "Update check: not done (switched off, or no answer from Modrinth or CurseForge)")
             : latest.isEmpty()
                 ? text("about.current", "You have the latest version.")
                 : Component.translatableWithFallback("config." + file.modId() + ".about.newer", "A newer version is out: %s", latest);
         addRenderableWidget(centered(0, y + 16, width, status));
+        String from = extras.source().get();
+        if (latest != null && from != null) {
+            addRenderableWidget(centered(0, y + 28, width,
+                Component.translatableWithFallback("config." + file.modId() + ".about.source", "Checked on %s", from)));
+            y += 12;
+        }
         y += 40;
         for (Link link : extras.links()) {
             addRenderableWidget(Button.builder(text("about." + link.key(), link.fallback()), b -> openLink(link.url()))

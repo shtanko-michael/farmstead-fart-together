@@ -19,4 +19,12 @@
 
 ## Проверка обновлений
 
-Раз за запуск мод спрашивает Modrinth, нет ли новой версии, и пишет одну строку в лог (её же показывает вкладка «О моде»). Больше ничего не отправляется. Выключается `general.checkUpdates = false` или `-Dfarmstead.updateCheck=false` (сервер).
+Раз за запуск мод спрашивает Modrinth, нет ли новой версии (если Modrinth не отвечает — CurseForge), и при любом ответе пишет в лог ровно одну строку:
+
+```
+[Farmstead] Fart Together 0.1.0 is the latest version (checked on Modrinth)
+[Farmstead] Fart Together 0.2.0 is available, this is 0.1.0. Download: https://modrinth.com/mod/farmstead-fart-together/version/...
+[Farmstead] Fart Together update check: could not reach Modrinth or CurseForge (...)
+```
+
+Тот же результат и каталог, который ответил, показывает вкладка «О моде». Больше ничего не отправляется, а неудачная проверка никогда не мешает игре. Выключается `general.checkUpdates = false` или `-Dfarmstead.updateCheck=false` (сервер); тогда в логе будет `[Farmstead] Fart Together update check off`.

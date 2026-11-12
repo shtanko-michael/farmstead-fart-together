@@ -10,6 +10,8 @@ public final class FartTogether {
     public static final String NAME = "Fart Together";
     /** Project slug on Modrinth: the start-up line links there and the update check asks it. */
     public static final String MODRINTH_SLUG = "farmstead-fart-together";
+    /** CurseForge project id: the update check asks CurseForge when Modrinth cannot answer ("" until the project exists: skipped). */
+    public static final String CURSEFORGE_ID = "";
     public static final String REPO = "https://github.com/shtanko-michael/farmstead-fart-together";
     public static final Logger LOGGER = LoggerFactory.getLogger("Fart Together");
     public static final String VERSION = /*$ mod_version*/"0.1.0";
@@ -26,7 +28,13 @@ public final class FartTogether {
     }
 
     public static void checkForUpdate() {
-        FarmsteadBrand.checkForUpdate(LOGGER, NAME, VERSION, ModLoaderAccess.get().loaderName(), MINECRAFT, MODRINTH_SLUG);
+        FarmsteadBrand.checkForUpdate(LOGGER, new FarmsteadBrand.Project(NAME, VERSION, ModLoaderAccess.get().loaderName(),
+            MINECRAFT, MODRINTH_SLUG, CURSEFORGE_ID));
+    }
+
+    /** The player switched the check off in the settings: one line saying so. */
+    public static void updateCheckOff() {
+        FarmsteadBrand.off(LOGGER, NAME);
     }
 
     /** {@code "minecraft:sand"} or {@code "sand"} to an id; null if malformed. */

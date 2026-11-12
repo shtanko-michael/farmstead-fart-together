@@ -5,7 +5,7 @@
 | `general.poses` | `true` | Показывать позу |
 | `general.gasMeter` | `true` | Шкала газа над едой |
 | `general.streamerSafe` | `false` | Все звуки — мягкий «пуф» |
-| `general.checkUpdates` | `true` | Раз за запуск спросить Modrinth о новой версии (см. ниже) |
+| `general.checkUpdates` | `true` | Раз за запуск спросить Modrinth (или CurseForge) о новой версии (см. ниже) |
 | `sounds.volume` | `1.0` | Громкость залпов (0–2) |
 | `sounds.mutedForOthers` | `false` | Не слышать чужие залпы |
 | `particles.amount` | `1.0` | Количество частиц во всём, что вы видите (0–3) |

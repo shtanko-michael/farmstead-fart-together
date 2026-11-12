@@ -70,7 +70,7 @@ Open them from Mod Menu (Fabric) or the mod list (NeoForge, Forge), type `/fartt
 | `general.poses` | `true` | Show the toot pose |
 | `general.gasMeter` | `true` | Show the gas meter above the food row |
 | `general.streamerSafe` | `false` | Every sound becomes a soft "puff" |
-| `general.checkUpdates` | `true` | Look for a newer version on Modrinth once per start (see below) |
+| `general.checkUpdates` | `true` | Look for a newer version on Modrinth (or CurseForge) once per start (see below) |
 | `sounds.volume` | `1.0` | Toot volume (0–2) |
 | `sounds.mutedForOthers` | `false` | Do not hear other players' toots |
 | `particles.amount` | `1.0` | Particle amount for everything you see (0–3) |
@@ -141,7 +141,15 @@ Example: `/lp group vip meta set farmstead_fart_together.cooldown 1`. On NeoForg
 
 ## Update check
 
-Once per start the mod asks Modrinth whether a newer version exists and writes one line to the log (the About tab of the settings shows it too). Nothing else is sent. Turn it off with `general.checkUpdates = false` or `-Dfarmstead.updateCheck=false` (servers).
+Once per start the mod asks Modrinth whether a newer version exists (CurseForge if Modrinth cannot answer) and writes exactly one line to the log, whatever the answer:
+
+```
+[Farmstead] Fart Together 0.1.0 is the latest version (checked on Modrinth)
+[Farmstead] Fart Together 0.2.0 is available, this is 0.1.0. Download: https://modrinth.com/mod/farmstead-fart-together/version/...
+[Farmstead] Fart Together update check: could not reach Modrinth or CurseForge (...)
+```
+
+The About tab of the settings shows the same result and which catalogue answered. Nothing else is sent, and a failed check never stops the game. Turn it off with `general.checkUpdates = false` or `-Dfarmstead.updateCheck=false` (servers); the log then says `[Farmstead] Fart Together update check off`.
 
 ## FAQ
 

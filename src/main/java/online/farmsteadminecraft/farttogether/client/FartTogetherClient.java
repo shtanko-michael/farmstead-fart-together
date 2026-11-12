@@ -19,12 +19,13 @@ public final class FartTogetherClient {
     public static void init() {
         ClientConfig.load();
         if (ClientConfig.CHECK_UPDATES.on()) FartTogether.checkForUpdate();
+        else FartTogether.updateCheckOff();
     }
 
     /** The settings screen, for the mod list (NeoForge/Forge) and Mod Menu (Fabric). */
     public static Screen configScreen(Screen parent) {
         String version = FartTogether.VERSION;
-        var extras = new ConfigScreen.Extras(FartTogether.NAME, version, () -> FarmsteadBrand.newerThan(version),
+        var extras = new ConfigScreen.Extras(FartTogether.NAME, version, () -> FarmsteadBrand.newerThan(version), FarmsteadBrand::source,
             List.of(
                 new ConfigScreen.Link("modrinth", "Modrinth page", "https://modrinth.com/mod/" + FartTogether.MODRINTH_SLUG),
                 new ConfigScreen.Link("curseforge", "CurseForge page", "https://www.curseforge.com/minecraft/mc-mods/" + FartTogether.MODRINTH_SLUG),

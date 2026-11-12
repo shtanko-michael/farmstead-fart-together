@@ -5,7 +5,7 @@ Open them from Mod Menu (Fabric) or the mod list (NeoForge, Forge), type `/fartt
 | `general.poses` | `true` | Show the toot pose |
 | `general.gasMeter` | `true` | Show the gas meter above the food row |
 | `general.streamerSafe` | `false` | Every sound becomes a soft "puff" |
-| `general.checkUpdates` | `true` | Look for a newer version on Modrinth once per start (see below) |
+| `general.checkUpdates` | `true` | Look for a newer version on Modrinth (or CurseForge) once per start (see below) |
 | `sounds.volume` | `1.0` | Toot volume (0–2) |
 | `sounds.mutedForOthers` | `false` | Do not hear other players' toots |
 | `particles.amount` | `1.0` | Particle amount for everything you see (0–3) |

@@ -16,5 +16,5 @@ First release.
 - **Your own style**, seen by your friends: cloud colour (presets, hex, gradients, random, rainbow), particle shape, size, amount, spread, duration, sound, pitch, volume and pose, with a "My style" tab and a live preview. The server clamps styles to its rules.
 - Server rules in `farmstead_fart_together-server.toml` (presets `default`, `family`, `plain`, `cosmetic` — the toot is pure decoration, `chaos`), `/fart info|reload|charge|toggle`, LuckPerms nodes for every action and meta for cooldown, cloud radius and meter size.
 - Streamer-safe mode (every sound becomes a soft "puff"), a particle limit for others' toots, 12 languages.
-- Farmstead start-up line and a once-per-session update check against Modrinth.
+- Farmstead start-up line and a once-per-session update check against Modrinth, with CurseForge as the fallback once the project id is set: exactly one log line per start (latest version, a newer one with its link, or "could not reach Modrinth or CurseForge" with a short reason); the About tab names the catalogue that answered.
 - Minecraft 1.20.1 (Fabric, Forge); 1.21–1.21.5, 1.21.7–1.21.11, 26.1–26.3 (Fabric, NeoForge). Fabric needs Fabric API.

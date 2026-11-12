@@ -24,7 +24,7 @@ public final class ClientConfig {
     public static final ConfigFile FILE = new ConfigFile(FartTogether.MOD_ID, "client", 1);
 
     public static final BoolValue CHECK_UPDATES = FILE.bool("general", "checkUpdates", true)
-        .comment("Once at start-up, ask Modrinth whether a newer Fart Together is out and say so in the log. Sends nothing about you.");
+        .comment("Once at start-up, ask Modrinth (or CurseForge if Modrinth does not answer) whether a newer Fart Together is out and say so in the log. Sends nothing about you.");
     public static final BoolValue STREAMER_SAFE = FILE.bool("general", "streamerSafe", false)
         .comment("Every sound becomes a soft puff: for streams and videos with strict platform rules.");
 

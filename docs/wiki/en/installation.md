@@ -19,4 +19,12 @@ Chest loot is not added on 26.3 yet (26.3 rewrote the loot builders). On 26.x vi
 
 ## Update check
 
-Once per start the mod asks Modrinth whether a newer version exists and writes one line to the log (the About tab of the settings shows it too). Nothing else is sent. Turn it off with `general.checkUpdates = false` or `-Dfarmstead.updateCheck=false` (servers).
+Once per start the mod asks Modrinth whether a newer version exists (CurseForge if Modrinth cannot answer) and writes exactly one line to the log, whatever the answer:
+
+```
+[Farmstead] Fart Together 0.1.0 is the latest version (checked on Modrinth)
+[Farmstead] Fart Together 0.2.0 is available, this is 0.1.0. Download: https://modrinth.com/mod/farmstead-fart-together/version/...
+[Farmstead] Fart Together update check: could not reach Modrinth or CurseForge (...)
+```
+
+The About tab of the settings shows the same result and which catalogue answered. Nothing else is sent, and a failed check never stops the game. Turn it off with `general.checkUpdates = false` or `-Dfarmstead.updateCheck=false` (servers); the log then says `[Farmstead] Fart Together update check off`.
