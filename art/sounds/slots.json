@@ -1,11 +1,11 @@
 {
-  "_comment": "Which candidate take each sound slot uses (art/sounds/candidates/<slot>/<slot>-<take>.ogg). Placeholders (take 1) until the owner chooses. Change a number, then: python -I tools/sounds.py install",
-  "short": 1,
-  "squeaky": 1,
-  "bubbly": 1,
-  "long": 1,
-  "trumpet": 1,
-  "tiny": 1,
-  "rumble": 1,
-  "puff": 1
+  "_comment": "Which candidate take each sound slot uses (art/sounds/candidates/<slot>/<slot>-<take>.ogg). Chosen by the owner on 2026-11-12 in the sound picker. Change a number, then: python -I tools/sounds.py install",
+  "short": 6,
+  "squeaky": 7,
+  "bubbly": 7,
+  "long": 6,
+  "trumpet": 7,
+  "tiny": 8,
+  "rumble": 7,
+  "puff": 8
 }
