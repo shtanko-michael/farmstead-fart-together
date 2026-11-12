@@ -34,7 +34,7 @@ Pick the colour of your cloud (presets, any hex colour, a gradient, random, rain
 
 ## ✦ For servers
 
-- A commented server file with presets (`family`, `plain`, `chaos`): cooldown, gas, clouds, effects, jet jump, combos, items, styles.
+- A commented server file with presets (`family`, `plain`, `cosmetic` for pure decoration, `chaos`): cooldown, gas, clouds, effects, jet jump, combos, items, styles.
 - `/fart info | reload | charge | toggle`.
 - **LuckPerms** nodes for every action and meta for cooldown, cloud size and meter size.
 - Vanilla players can join; a server for them can switch the new items off.

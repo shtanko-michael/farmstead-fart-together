@@ -111,6 +111,9 @@ public final class ServerConfig {
         FILE.reloadCommand("fart reload");
         FILE.preset("family", Map.of("toot.cooldownSeconds", 5.0, "cloud.effects", "[]"))
             .preset("plain", Map.of("style.allowCustom", false))
+            // pure decoration: the toot only looks and sounds; nothing it does changes the game
+            .preset("cosmetic", Map.of("charge.required", false, "cloud.scareMobs", false, "cloud.effects", "[]",
+                "cloud.affectsPlayers", false, "jetJump.enabled", false, "together.glow", false))
             .preset("chaos", Map.of("toot.cooldownSeconds", 1.0, "charge.minToToot", 5, "charge.passivePerMinute", 10.0,
                 "cloud.durationSeconds", 15.0, "cloud.radius", 4.0, "cloud.effects", "[\"minecraft:nausea 5 1\"]",
                 "cloud.affectsPlayers", true, "jetJump.strength", 1.0, "together.windowSeconds", 2.5));
