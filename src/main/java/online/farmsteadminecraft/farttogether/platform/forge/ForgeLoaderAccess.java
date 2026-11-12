@@ -55,7 +55,14 @@ final class ForgeLoaderAccess implements ModLoaderAccess {
 
     @Override
     public boolean permission(ServerPlayer player, Perm perm) {
-        return PermissionAPI.getPermission(player, NODES.get(perm));
+        // a permission mod may not know the player yet: the command tree is sent while the player is still
+        // being placed in the world (LuckPerms on NeoForge throws "Capability has not been initialised" there),
+        // so a refusal to answer falls back to the default and the player still joins
+        try {
+            return PermissionAPI.getPermission(player, NODES.get(perm));
+        } catch (RuntimeException e) {
+            return perm.byDefault(player);
+        }
     }
 
     @Override

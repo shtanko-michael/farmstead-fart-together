@@ -1,9 +1,9 @@
 """LuckPerms live: the mod's permission nodes and meta with the real LuckPerms on a dev server and two clients.
 
-    python -I tools/lp_test.py 1.21.1-neoforge build/thirdparty/luckperms/LuckPerms-NeoForge-5.4.140.jar
+    python -I tools/lp_test.py 1.21.1-neoforge build/thirdparty/luckperms/LuckPerms-NeoForge-5.4.150.jar
     python -I tools/lp_test.py 1.21.1-fabric   build/thirdparty/luckperms/LuckPerms-Fabric-5.4.140.jar
 
-The LuckPerms jar (official, from Modrinth) is copied into run/<target>/server/mods for the run and removed after.
+The LuckPerms jar (official: Fabric from Modrinth, NeoForge 5.4.150 from luckperms.net — Modrinth's 5.4.140 kicks every player on join) is copied into run/<target>/server/mods for the run and removed after.
 Everything is set from the server console through RCON (`lp user|group ...`), then checked in the clients' logs
 (styles and gas the server sent, toots played) and in screenshots:
 
