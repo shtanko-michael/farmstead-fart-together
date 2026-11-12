@@ -83,6 +83,7 @@ public final class ServerConfig {
 
     static {
         SCARED.picker(StringListValue.Picker.ENTITIES);
+        FILE.reloadCommand("fart reload");
         FILE.preset("family", Map.of("toot.cooldownSeconds", 5.0, "cloud.effects", "[]"))
             .preset("plain", Map.of("style.allowCustom", false))
             .preset("chaos", Map.of("toot.cooldownSeconds", 1.0, "charge.minToToot", 5, "charge.passivePerMinute", 10.0,

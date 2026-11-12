@@ -29,7 +29,8 @@ public final class FartTogetherClient {
                 new ConfigScreen.Link("modrinth", "Modrinth page", "https://modrinth.com/mod/" + FartTogether.MODRINTH_SLUG),
                 new ConfigScreen.Link("curseforge", "CurseForge page", "https://www.curseforge.com/minecraft/mc-mods/" + FartTogether.MODRINTH_SLUG),
                 new ConfigScreen.Link("issues", "Report a bug or an idea", FartTogether.REPO + "/issues")),
-            FartTogetherClient::tryIt);
+            FartTogetherClient::tryIt,
+            List.of(new ConfigScreen.CustomTab("my_style", "My style", new MyStyleTab())));
         return new ConfigScreen(parent, ClientConfig.FILE, ClientConfig::save, ClientConfig::load, extras);
     }
 

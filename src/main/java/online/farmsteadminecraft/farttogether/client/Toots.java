@@ -148,7 +148,7 @@ public final class Toots {
         Random r = l.rnd();
         Style s = l.style();
         double area = l.radius() * l.radius();
-        int n = Math.max(1, (int) Math.round(area * 0.5 * Math.min(2f, s.amount()) * ClientConfig.PARTICLES.floatValue()));
+        int n = Math.max(1, (int) Math.round(area * 0.3 * Math.min(2f, s.amount()) * ClientConfig.PARTICLES.floatValue()));
         if (l.left()[0] < 30) n = Math.max(1, n * l.left()[0] / 30);
         for (int i = 0; i < n; i++) {
             // a point in the sphere, flattened a little: gas sinks
@@ -158,14 +158,15 @@ public final class Toots {
                 y = r.nextDouble() * 2 - 1;
                 z = r.nextDouble() * 2 - 1;
             } while (x * x + y * y + z * z > 1);
-            Vec3 p = l.pos().add(x * l.radius(), y * l.radius() * 0.6, z * l.radius());
+            // flattened and kept above the ground under the cloud: a particle inside a block is drawn black
+            Vec3 p = l.pos().add(x * l.radius(), (y * 0.5 + 0.2) * l.radius() * 0.6, z * l.radius());
             boolean colourless = s.shape() == Style.Shape.NOTES || s.shape() == Style.Shape.HEARTS;
             ParticleOptions type = colourless ? ParticleTypes.CLOUD : shape(s.shape());
             Particle particle = mc.particleEngine.createParticle(type, p.x, p.y, p.z,
                 (r.nextDouble() - 0.5) * 0.01, 0.002 + r.nextDouble() * 0.006, (r.nextDouble() - 0.5) * 0.01);
             if (particle == null) continue;
             tint(particle, color(s, l.hue(), r));
-            particle.scale(Math.max(0.6f, s.size()) * 1.5f);
+            particle.scale(Math.max(0.6f, Math.min(2f, s.size())));
             if (type == ParticleTypes.CLOUD) particle.setLifetime(24 + r.nextInt(16));
         }
     }

@@ -54,11 +54,11 @@ public final class FartCommands {
                 tr(TootServer.isModded(p.getUUID()) ? "info.modded" : "info.vanilla",
                     TootServer.isModded(p.getUUID()) ? "has the mod" : "has no mod (nothing to see)")));
         }
-        ok(s, tr("info.server", "Server: gas %s, cloud %s s, scares mobs %s, effects %s, items %s",
-            ServerConfig.CHARGE_REQUIRED.on() ? "required" : "free", fmt(ServerConfig.CLOUD_SECONDS.value()),
-            ServerConfig.SCARE.on() ? "yes" : "no",
-            ServerConfig.EFFECTS.get().isEmpty() ? "none" : String.join(", ", ServerConfig.EFFECTS.get()),
-            Content.enabled() ? "yes" : "no"));
+        ok(s, tr("info.server", "Server: gas %s, cloud %s s, scares mobs %s, effects %s, beans and cabbage %s",
+            ServerConfig.CHARGE_REQUIRED.on() ? tr("info.required", "required") : tr("info.free", "not needed"),
+            fmt(ServerConfig.CLOUD_SECONDS.value()), yesNo(ServerConfig.SCARE.on()),
+            ServerConfig.EFFECTS.get().isEmpty() ? tr("info.none", "none") : Component.literal(String.join(", ", ServerConfig.EFFECTS.get())),
+            yesNo(Content.enabled())));
         return 1;
     }
 
@@ -80,7 +80,7 @@ public final class FartCommands {
             TootServer.sendCharge(p);
         }
         String who = targets.size() == 1 ? targets.iterator().next().getName().getString() : String.valueOf(targets.size());
-        ok(c.getSource(), tr("charge", "Gas of %s set to %s", who, amount < 0 ? "full" : amount));
+        ok(c.getSource(), tr("charge", "Gas of %s set to %s", who, amount < 0 ? tr("charge.full", "full") : amount));
         return targets.size();
     }
 
@@ -93,6 +93,10 @@ public final class FartCommands {
                 p.getName().getString()));
         }
         return targets.size();
+    }
+
+    private static Component yesNo(boolean on) {
+        return on ? tr("info.yes", "yes") : tr("info.no", "no");
     }
 
     private static void ok(CommandSourceStack s, Component text) {

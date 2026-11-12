@@ -21,6 +21,7 @@ public final class TestHooks {
      *  so there the runner passes the address here and the hook connects from the title screen. */
     private static final String JOIN = System.getProperty("farmstead.testhooks.join");
     private static boolean joined;
+    private static int useTicks;
 
     private TestHooks() {
     }
@@ -41,6 +42,10 @@ public final class TestHooks {
             join(mc, title);
         }
         *///?}
+        if (useTicks > 0) {
+            useTicks--;
+            mc.options.keyUse.setDown(useTicks > 0);
+        }
         Path dir = mc.gameDirectory.toPath().resolve("testhooks");
         if (!Files.isDirectory(dir)) return;
         try (Stream<Path> files = Files.list(dir)) {
@@ -62,6 +67,15 @@ public final class TestHooks {
                     Files.deleteIfExists(req);
                     if (screen(mc) instanceof online.farmsteadminecraft.farttogether.config.ConfigScreen cs) cs.openPicker(arg[0], arg.length > 1 ? arg[1] : "");
                     else if (screen(mc) instanceof online.farmsteadminecraft.farttogether.config.PickerScreen ps) ps.search(arg.length > 1 ? arg[1] : "");
+                } else if (file.equals("mystyle.play")) {
+                    // presses "Play" on the open My style tab
+                    Files.deleteIfExists(req);
+                    MyStyleTab.playOpen();
+                } else if (file.equals("use")) {
+                    // "<ticks>": holds the use key (eating, drinking) for that long
+                    String arg = Files.readString(req).trim();
+                    Files.deleteIfExists(req);
+                    useTicks = arg.isEmpty() ? 40 : Integer.parseInt(arg);
                 } else if (file.equals("try.it")) {
                     Files.deleteIfExists(req);
                     //? if >=26.2 {

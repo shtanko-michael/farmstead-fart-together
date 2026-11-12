@@ -34,8 +34,23 @@ public class ConfigScreen extends Screen {
     private static final int CONTROL_W = 160;
     private static final String ABOUT = "about";
 
-    /** What the About tab and the bottom row show besides the values. */
-    public record Extras(String name, String version, Supplier<String> latest, List<Link> links, Runnable tryIt) {}
+    /** What the About tab and the bottom row show besides the values; {@code tabs} come before the sections. */
+    public record Extras(String name, String version, Supplier<String> latest, List<Link> links, Runnable tryIt,
+                         List<CustomTab> tabs) {
+        public Extras(String name, String version, Supplier<String> latest, List<Link> links, Runnable tryIt) {
+            this(name, version, latest, links, tryIt, List.of());
+        }
+    }
+
+    /**
+     * A tab the mod fills itself (a preview, for example): {@code content} adds its widgets to the area between the
+     * tab row and the bottom buttons. Widgets only, no render override, so it stays as version-safe as the rest.
+     */
+    public record CustomTab(String key, String fallback, TabContent content) {}
+
+    public interface TabContent {
+        void init(ConfigScreen screen, Consumer<AbstractWidget> add, int left, int top, int width, int height);
+    }
 
     public record Link(String key, String fallback, String url) {}
 
@@ -73,7 +88,9 @@ public class ConfigScreen extends Screen {
     @Override
     protected void init() {
         Map<String, List<ConfigValue<?>>> sections = sections();
-        List<String> tabs = new ArrayList<>(sections.keySet());
+        List<String> tabs = new ArrayList<>();
+        if (extras != null) extras.tabs().forEach(t -> tabs.add(t.key()));
+        tabs.addAll(sections.keySet());
         if (extras != null) tabs.add(ABOUT);
         if (tab == null || !tabs.contains(tab)) tab = tabs.get(0);
         int center = width / 2;
@@ -84,7 +101,7 @@ public class ConfigScreen extends Screen {
         int tabX = center - tabW * tabs.size() / 2;
         for (int i = 0; i < tabs.size(); i++) {
             String t = tabs.get(i);
-            Button b = Button.builder(text("section." + t, pretty(t)), btn -> {
+            Button b = Button.builder(tabLabel(t), btn -> {
                 tab = t;
                 page = 0;
                 rebuildWidgets();
@@ -94,8 +111,12 @@ public class ConfigScreen extends Screen {
         }
 
         int by = height - 28;
+        CustomTab custom = extras == null ? null
+            : extras.tabs().stream().filter(t -> t.key().equals(tab)).findFirst().orElse(null);
         if (ABOUT.equals(tab)) {
             about(center);
+        } else if (custom != null) {
+            custom.content().init(this, this::addRenderableWidget, 10, 46, width - 20, by - 46 - 6);
         } else {
             Button preset = Button.builder(presetLabel(), b -> {
                 List<String> names = new ArrayList<>(file.presetNames());
@@ -218,10 +239,34 @@ public class ConfigScreen extends Screen {
         minecraft.setScreen(parent);
     }
 
+    /** A custom tab (the live preview) keeps a single-player world running so the model can move. */
+    @Override
+    public boolean isPauseScreen() {
+        return extras == null || extras.tabs().stream().noneMatch(t -> t.key().equals(tab));
+    }
+
     @Override
     public void onClose() {
         onCancel.run();
         close();
+    }
+
+    private Component tabLabel(String t) {
+        if (extras != null) {
+            for (CustomTab c : extras.tabs()) {
+                if (c.key().equals(t)) return text("section." + t, c.fallback());
+            }
+        }
+        return text("section." + t, pretty(t));
+    }
+
+    /** Rebuilds the widgets (a custom tab changed something the controls show). */
+    public void refresh() {
+        rebuildWidgets();
+    }
+
+    public net.minecraft.client.gui.Font font() {
+        return font;
     }
 
     private Component presetLabel() {

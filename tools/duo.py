@@ -11,6 +11,14 @@ each with its own style in its client file, and drives them through the mod's Te
   3. Tester asks for a rainbow (needs farmstead_fart_together.style.rainbow, which nobody has): the server must
      clamp it to a solid colour for everyone;
   4. Tester2 switches style.others to "simple": Tester's next toot is the plain green puff on Tester2's screen.
+M2 (gas, cloud, items, commands, My style):
+  5. with no gas Tester's toot is refused (action bar hint), nothing reaches Tester2;
+  6. Tester eats a bowl of beans (use key held): the gas meter appears;
+  7. cows, a pig and a zombie stand behind Tester; a full-meter toot leaves a cloud and they run (positions
+     before and after, from the server);
+  8. a row of bean and cabbage crops at every stage;
+  9. /fart toggle Tester2: Tester2's toot is refused; toggled back;
+ 10. Tester's settings open on the My style tab: preview, then "Play".
 
 Screenshots and duo-report.txt land in build/scenes/<target>/duo/. Subtitles are on and the game volume is very low
 so the subtitle line proves the sound was played on the listener's side without filling the room with noise.
@@ -116,10 +124,17 @@ def main() -> int:
             for ctx, name in shooters:
                 ctx.shot(f"{tag}-{name}")
 
+        def full(name: str) -> None:
+            rcon.cmd(f"fart charge {name} full")
+            time.sleep(0.3)
+
+        full(A)
+        full(B)
         print("1. Tester toots")
         toot_and_shoot(dir_a, "1-a-toots", [(sb, "seen-by-b"), (sa, "seen-by-a")])
         time.sleep(3.5)  # server cooldown is 3 s
 
+        full(A)
         print("2. Tester2 toots")
         rcon.cmd(f"tp {A} 0.5 {Y} 0.5 -90 10")  # A turns to look at B's side
         rcon.cmd(f"tp {B} 4.5 {Y} 0.5 0 0")
@@ -128,6 +143,7 @@ def main() -> int:
         toot_and_shoot(dir_b, "2-b-toots", [(sa, "seen-by-a")])
         time.sleep(3.5)
 
+        full(B)
         print("3. Tester asks for rainbow (no permission: the server makes it solid)")
         (dir_a / "config" / CFG).write_text(client_file(dict(STYLE_A, color='"rainbow"')), encoding="utf-8")
         hook(dir_a, "config.reload")
@@ -135,15 +151,18 @@ def main() -> int:
         rcon.cmd(f"tp {A} 0.5 {Y} 0.5 0 0")
         rcon.cmd(f"tp {B} 4.5 {Y} -0.5 90 10")
         time.sleep(1.5)
+        full(A)
         toot_and_shoot(dir_a, "3-a-rainbow-clamped", [(sb, "seen-by-b")])
         time.sleep(3.5)
+        full(A)
 
         print("4. Tester2 sets style.others = simple")
         (dir_b / "config" / CFG).write_text(client_file(STYLE_B, others="simple"), encoding="utf-8")
         hook(dir_b, "config.reload")
         time.sleep(2)
         toot_and_shoot(dir_a, "4-a-toots-b-simple", [(sb, "seen-by-b")])
-        time.sleep(2)
+        time.sleep(3.5)
+        m2(rcon, dir_a, dir_b, sa, sb, out)
 
         report(out, ca, cb, server)
         return 0
@@ -153,10 +172,108 @@ def main() -> int:
                 kill_tree(p.proc)
 
 
+def pos(rcon, selector: str):
+    """Server-side position of one entity, or None."""
+    text = rcon.cmd(f"data get entity {selector} Pos") or ""
+    m = re.search(r"\[(-?[\d.]+)d, (-?[\d.]+)d, (-?[\d.]+)d\]", text)
+    return tuple(float(v) for v in m.groups()) if m else None
+
+
+def m2(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path) -> None:
+    lines = []
+    print("5. no gas: refused")
+    rcon.cmd(f"fart charge {A} 0")
+    rcon.cmd(f"tp {A} 0.5 {Y} 0.5 0 0")
+    rcon.cmd(f"tp {B} 4.5 {Y} -0.5 90 10")
+    hook(dir_a, "camera", "back")
+    time.sleep(1.5)
+    hook(dir_a, "toot")
+    time.sleep(0.5)
+    sa.shot("5-a-no-gas")
+    time.sleep(1)
+
+    print("6. Tester eats a bowl of beans")
+    rcon.cmd(f"item replace entity {A} hotbar.0 with farmstead_fart_together:bowl_of_beans")
+    hook(dir_a, "camera", "first")
+    time.sleep(1)
+    hook(dir_a, "use", "45")
+    time.sleep(3.5)
+    sa.shot("6-a-gas-meter")
+    lines.append("after the bowl of beans: see 'test: charge' lines in client-Tester.log")
+
+    print("7. scare: mobs behind Tester run from the cloud")
+    rcon.cmd("difficulty easy")
+    rcon.cmd(f"fill -6 {Y} -6 6 {Y + 5} 6 air")
+    for i, (kind, x, z) in enumerate((("cow", -1.0, -2.5), ("cow", 1.5, -3.0), ("pig", 0.5, -1.8), ("zombie", -0.5, -3.5),
+                                       ("sheep", 2.0, -2.0))):
+        rcon.cmd(f"summon minecraft:{kind} {x} {Y} {z} {{NoAI:0b,PersistenceRequired:1b,Tags:[\"ft\"]}}")
+    time.sleep(1.5)
+    before = {k: pos(rcon, f"@e[type=minecraft:{k},tag=ft,limit=1,sort=nearest]") for k in ("cow", "pig", "zombie", "sheep")}
+    rcon.cmd(f"tp {A} 0.5 {Y} 0.5 0 0")
+    rcon.cmd(f"tp {B} 7.5 {Y + 1} -1.5 90 15")
+    hook(dir_b, "camera", "first")
+    rcon.cmd(f"fart charge {A} full")
+    time.sleep(1)
+    hook(dir_a, "toot")
+    time.sleep(0.6)
+    sb.shot("7-b-cloud")
+    time.sleep(1.6)
+    sb.shot("7-b-mobs-run")
+    time.sleep(1.5)
+    after = {k: pos(rcon, f"@e[type=minecraft:{k},tag=ft,limit=1,sort=nearest]") for k in before}
+    cloud = (0.5, Y + 0.75, -0.1)
+    for k in before:
+        b, a = before[k], after[k]
+        if b and a:
+            db = ((b[0] - cloud[0]) ** 2 + (b[2] - cloud[2]) ** 2) ** 0.5
+            da = ((a[0] - cloud[0]) ** 2 + (a[2] - cloud[2]) ** 2) ** 0.5
+            lines.append(f"{k}: {db:.1f} -> {da:.1f} blocks from the cloud")
+        else:
+            lines.append(f"{k}: position unknown ({b} -> {a})")
+    rcon.cmd("kill @e[tag=ft]")
+    rcon.cmd("difficulty peaceful")
+
+    print("8. crops at every stage")
+    rcon.cmd(f"fill -6 {Y - 1} 3 6 {Y - 1} 4 farmland")
+    for i, age in enumerate((0, 2, 4, 5, 6, 7)):
+        rcon.cmd(f"setblock {i - 3} {Y} 3 farmstead_fart_together:bean_crop[age={age}]")
+        rcon.cmd(f"setblock {i - 3} {Y} 4 farmstead_fart_together:cabbage_crop[age={age}]")
+    rcon.cmd(f"tp {B} 0.5 {Y + 1.5} 0.5 0 30")
+    rcon.cmd(f"tp {A} -8.5 {Y} -8.5 0 0")
+    time.sleep(2.5)
+    sb.shot("8-b-crops")
+
+    print("9. /fart toggle Tester2")
+    lines.append("toggle: " + (rcon.cmd(f"fart toggle {B}") or "").strip())
+    rcon.cmd(f"fart charge {B} full")
+    time.sleep(0.5)
+    hook(dir_b, "toot")
+    time.sleep(0.6)
+    sb.shot("9-b-toggled-off")
+    lines.append("toggle back: " + (rcon.cmd(f"fart toggle {B}") or "").strip())
+    lines.append("info (console): " + (rcon.cmd("fart info") or "").strip())
+
+    print("10. My style tab")
+    rcon.cmd(f"tp {A} 0.5 {Y} 0.5 0 0")
+    hook(dir_a, "camera", "first")
+    hook(dir_a, "config.open")
+    time.sleep(1.5)
+    hook(dir_a, "config.tab", "my_style")
+    time.sleep(1.5)
+    sa.shot("10-a-my-style")
+    hook(dir_a, "mystyle.play")
+    time.sleep(0.5)
+    sa.shot("10-a-my-style-play")
+    (out / "m2-report.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print("\n".join(lines))
+
+
 def report(out: Path, ca: Proc, cb: Proc, server: Proc) -> None:
     la, lb, ls = "".join(ca.lines), "".join(cb.lines), "".join(server.lines)
-    heard_b = re.findall(r"test: toot by (\w+) sound=(\w+) shape=(\w+) color=(\w+) own=(\w+)", lb)
-    heard_a = re.findall(r"test: toot by (\w+) sound=(\w+) shape=(\w+) color=(\w+) own=(\w+)", la)
+    toot = r"test: toot by (\w+) sound=(\w+) shape=(\w+) color=(\w+) own=(\w+) power=(\d) radius=([\d.]+) linger=(\d+)"
+    heard_b = re.findall(toot, lb)
+    heard_a = re.findall(toot, la)
+    charges_a = re.findall(r"test: charge (\d+/\d+) min (\d+) enabled (\w+)", la)
     styles_b = re.findall(r"test: style of \S+ = (Style\[[^\]]*\])", lb)
     lines = [
         f"A hello answered: {'yes' if 'server runs Fart Together protocol' in la else 'NO'}",
@@ -165,6 +282,8 @@ def report(out: Path, ca: Proc, cb: Proc, server: Proc) -> None:
         *[f"  {h}" for h in heard_b],
         "toots played on A's client:",
         *[f"  {h}" for h in heard_a],
+        "gas A was told (charge/max, min, enabled):",
+        *[f"  {c}" for c in charges_a],
         "styles B received:",
         *[f"  {s[:220]}" for s in styles_b],
     ]

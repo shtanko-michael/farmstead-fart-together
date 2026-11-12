@@ -78,8 +78,8 @@ TABLE = {
         "Başka bir oyuncunun tek osuruğunun ekranında çizebileceği en fazla parçacık. Zayıf bilgisayarda düşürün.",
     ],
     C + "section.style": [
-        "My style", "Мой стиль", "我的风格", "Meu estilo", "Mi estilo", "Mein Stil", "Mon style", "Mój styl",
-        "Мій стиль", "マイスタイル", "내 스타일", "Benim tarzım",
+        "Style details", "Стиль подробно", "风格细节", "Detalhes do estilo", "Detalles del estilo", "Stil im Detail",
+        "Style en détail", "Szczegóły stylu", "Стиль докладно", "スタイル詳細", "스타일 세부", "Tarz ayrıntıları",
     ],
     C + "style.others": [
         "Others' toots", "Чужие залпы", "他人的屁", "Puns dos outros", "Pedorretas ajenas", "Pupse der anderen",

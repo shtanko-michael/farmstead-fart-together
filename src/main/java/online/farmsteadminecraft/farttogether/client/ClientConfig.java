@@ -74,6 +74,7 @@ public final class ClientConfig {
         .comment("Your pose: classic (lean forward, hands on knees), hero (hands on hips) or none.");
 
     static {
+        FILE.reloadCommand("farttogether reload");
         FILE.preset("family", Map.of(
                 "general.streamerSafe", true,
                 "sounds.volume", 0.6))

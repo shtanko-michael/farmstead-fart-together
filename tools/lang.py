@@ -469,8 +469,10 @@ T = {
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lang_more import TABLE as _MORE  # noqa: E402
+from lang_m2 import TABLE as _M2  # noqa: E402
 
 T.update(_MORE)
+T.update(_M2)
 
 PH = re.compile(r"%(?:\d+\$)?[sd]")
 
@@ -483,8 +485,38 @@ def write():
     print(f"{len(LANGS)} languages x {len(T)} keys -> {OUT}")
 
 
+JAVA = ROOT / "src/main/java"
+NS = "farmstead_fart_together"
+
+
+def used_keys() -> set[str]:
+    """Keys the code asks for: literal keys, K/C + "..." in the command and tab code, client settings, items."""
+    keys = set()
+    literal = re.compile(r'"((?:item|block|message|command|config|key|subtitles)\.' + NS + r'\.[A-Za-z0-9_.]*[A-Za-z0-9_])"')
+    prefixed = re.compile(r'\b([KC])\s*\+\s*"([A-Za-z0-9_.]*[A-Za-z0-9_])"')
+    tr = re.compile(r'\btr\("([A-Za-z0-9_.]+)"')
+    for f in JAVA.rglob("*.java"):
+        text = f.read_text(encoding="utf-8")
+        keys.update(literal.findall(text))
+        if f.name in ("FartCommands.java", "MyStyleTab.java"):
+            for kind, rest in prefixed.findall(text):
+                keys.add(("command." if kind == "K" else "config.") + NS + "." + rest)
+            if f.name == "FartCommands.java":
+                keys.update(f"command.{NS}.{k}" for k in tr.findall(text))
+    client = (JAVA / "online/farmsteadminecraft/farttogether/client/ClientConfig.java").read_text(encoding="utf-8")
+    for section, key in re.findall(r'FILE\.\w+\("(\w+)", "(\w+)"', client):
+        keys.add(f"config.{NS}.{section}.{key}")
+        keys.add(f"config.{NS}.{section}.{key}.tooltip")
+    content = (JAVA / "online/farmsteadminecraft/farttogether/content/Content.java").read_text(encoding="utf-8")
+    blocks, items = content.split("public static void registerItems", 1)
+    keys.update(f"block.{NS}.{n}" for n in re.findall(r'sink\.accept\("(\w+)"', blocks))
+    keys.update(f"item.{NS}.{n}" for n in re.findall(r'sink\.accept\("(\w+)"', items))
+    return keys
+
+
 def check() -> int:
     errors = [f"table: {k} has {len(v)} strings, not {len(LANGS)}" for k, v in T.items() if len(v) != len(LANGS)]
+    errors += [f"code uses {k}, the table has no such key" for k in sorted(used_keys()) if k not in T]
     ref = json.loads((OUT / "en_us.json").read_text(encoding="utf-8"))
     for lang in LANGS:
         path = OUT / f"{lang}.json"
