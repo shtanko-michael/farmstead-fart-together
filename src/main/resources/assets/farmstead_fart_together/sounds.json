@@ -1,0 +1,74 @@
+{
+  "toot.short": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.short",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/short",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "toot.squeaky": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.squeaky",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/squeaky",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "toot.bubbly": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.bubbly",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/bubbly",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "toot.long": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.long",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/long",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "toot.trumpet": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.trumpet",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/trumpet",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "toot.tiny": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.tiny",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/tiny",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "toot.rumble": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.rumble",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/rumble",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "toot.puff": {
+    "subtitle": "subtitles.farmstead_fart_together.toot.puff",
+    "sounds": [
+      {
+        "name": "farmstead_fart_together:toot/puff",
+        "attenuation_distance": 24
+      }
+    ]
+  }
+}
