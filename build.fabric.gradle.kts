@@ -84,6 +84,8 @@ loom {
         providers.gradleProperty("clientSize").orNull?.split("x")?.let { programArgs("--width", it[0], "--height", it[1]) }
         // `-PtestHooks` lets the test runner request screenshots through files (see TestHooks)
         if (providers.gradleProperty("testHooks").isPresent) vmArg("-Dfarmstead.testhooks=true")
+        // `-PclientDir=client2` runs a second client next to the first (two-player tests, tools/duo.py)
+        providers.gradleProperty("clientDir").orNull?.let { runDirectory = rootProject.file("run/${sc.current.project}/$it") }
     }
 }
 

@@ -88,10 +88,10 @@ public final class TootPose {
             m.leftArm.zRot = lerp(m.leftArm.zRot, -0.75f, w);
             m.head.xRot = lerp(m.head.xRot, -0.3f, w);
         }
-        m.body.zRot += shake;
-        m.head.zRot += shake * 0.6f;
-        m.rightLeg.zRot -= shake * 0.4f;
-        m.leftLeg.zRot -= shake * 0.4f;
+        // assigned, not added: before 1.21.2 vanilla never resets body.zRot, so "+=" piled up every frame and spun
+        // the torso around; vanilla leaves both at 0 for a standing player
+        m.body.zRot = shake;
+        m.head.zRot = shake * 0.6f;
     }
 
     private static float lerp(float a, float b, float w) {

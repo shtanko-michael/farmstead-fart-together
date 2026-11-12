@@ -42,7 +42,8 @@ neoForge {
 
     runs {
         register("client") {
-            gameDirectory = rootProject.file("run/${sc.current.project}/client")
+            // `-PclientDir=client2` runs a second client next to the first (two-player tests, tools/duo.py)
+            gameDirectory = rootProject.file("run/${sc.current.project}/${providers.gradleProperty("clientDir").orNull ?: "client"}")
             client()
             // `-PquickPlay=localhost:25600` joins a server straight away, `-PmcUser=Name` picks the offline name
             providers.gradleProperty("quickPlay").orNull?.let { programArguments.addAll("--quickPlayMultiplayer", it) }
