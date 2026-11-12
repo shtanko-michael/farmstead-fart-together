@@ -1,5 +1,5 @@
 {
-  "_comment": "Which Codex variant each texture group uses (art/textures/candidates/<group>/<variant>/). Variant 1 installed by default on 2026-11-12, the owner chooses from compare.png. Change a number, then: python -I tools/art.py install",
+  "_comment": "Which Codex variant each texture group uses (art/textures/candidates/<group>/<variant>/). Chosen by the owner on 2026-11-12 in the texture picker (art/textures/picker/index.html): items 1, crops 1, icon 1. Change a number, then: python -I tools/art.py install",
   "items": 1,
   "crops": 1,
   "icon": 1

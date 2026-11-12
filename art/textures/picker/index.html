@@ -1,0 +1,135 @@
+<title>Fart Together Textures</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one band per texture group; its three variants side by side as inventory-style plates, the chosen one lit. */
+:root {
+  --bg: #f4f6f1; --panel: #ffffff; --ink: #1c2420; --muted: #5d6b63; --rule: #dde3dc;
+  --accent: #3f8f3a; --accent-ink: #ffffff; --accent-soft: #e2f0dd; --slot: #8b8b8b; --slot-in: #c6c6c6; --warm: #b8762b;
+  --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121714; --panel: #1a211d; --ink: #e3ebe5; --muted: #95a59b; --rule: #2a352f;
+  --accent: #7ccc6c; --accent-ink: #0f1a10; --accent-soft: #1f3320; --slot: #3a3f3c; --slot-in: #555b57; --warm: #e0a25a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121714; --panel: #1a211d; --ink: #e3ebe5; --muted: #95a59b; --rule: #2a352f;
+  --accent: #7ccc6c; --accent-ink: #0f1a10; --accent-soft: #1f3320; --slot: #3a3f3c; --slot-in: #555b57; --warm: #e0a25a; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 32px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 40px); letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 64ch; line-height: 1.5; margin: 10px 0 0; }
+.status { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+.pill { font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pill.warn { background: transparent; color: var(--warm); border: 1px solid var(--warm); }
+.group { margin-top: 30px; }
+.group h2 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0; }
+.group p { color: var(--muted); margin: 4px 0 12px; font-size: 14px; }
+.variants { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.variant { background: var(--panel); border: 2px solid var(--rule); border-radius: 10px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.variant.chosen { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.vhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.vhead b { font-family: var(--display); font-size: 17px; }
+.choose { font: 600 13px var(--body); border: 1px solid var(--rule); background: var(--bg); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.choose:hover { border-color: var(--accent); }
+.choose[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.choose:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+.tile { display: grid; gap: 3px; justify-items: center; }
+.slot { width: 52px; height: 52px; background: var(--slot-in); border: 2px solid var(--slot); display: grid; place-items: center; }
+.slot img { width: 48px; height: 48px; image-rendering: pixelated; max-width: 100%; }
+.tile span { font-size: 10.5px; color: var(--muted); font-family: var(--mono); max-width: 60px; text-align: center; overflow-wrap: anywhere; }
+.ground { display: flex; align-items: flex-end; gap: 0; background: linear-gradient(var(--slot-in) 70%, #6b4a2f 70%); padding: 6px 6px 0; border: 2px solid var(--slot); width: fit-content; max-width: 100%; overflow-x: auto; }
+.ground img { width: 44px; height: 44px; image-rendering: pixelated; display: block; }
+.icon img { width: 100%; max-width: 220px; aspect-ratio: 1; border-radius: 12px; display: block; }
+.icon .small { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 12px; }
+.icon .small img { width: 32px; height: 32px; border-radius: 6px; }
+@media (max-width: 760px) { .variants { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <h1>Fart Together textures</h1>
+  <p class="lede">Codex drew three variants of every group; here they are already cut down to the game's 16×16 pixels and shown at 3× on an inventory slot. Press <b>choose</b> on the variant you want for each group. Your choice is saved here and goes into the mod.</p>
+  <div class="status"><span class="pill" id="count">0 of 3 chosen</span><span class="pill warn" id="save" hidden></span></div>
+  <div id="groups"></div>
+</div>
+
+<script>
+const GROUPS = [
+  { id: "items", name: "Items", note: "Beans, cabbage seeds, cabbage, a bowl of beans, and the gas meter icon (empty and full).",
+    files: [["beans","beans"],["cabbage_seeds","cabbage seeds"],["cabbage","cabbage"],["bowl_of_beans","bowl of beans"],["gas_icon","gas meter"],["gas_icon_full","gas meter full"]] },
+  { id: "crops", name: "Crops", note: "Bean and cabbage crops, four growth stages each, shown standing on farmland.",
+    files: [["bean_crop_stage0","bean 0"],["bean_crop_stage1","bean 1"],["bean_crop_stage2","bean 2"],["bean_crop_stage3","bean 3"],
+            ["cabbage_crop_stage0","cabbage 0"],["cabbage_crop_stage1","cabbage 1"],["cabbage_crop_stage2","cabbage 2"],["cabbage_crop_stage3","cabbage 3"]] },
+  { id: "icon", name: "Mod icon", note: "Shown on Modrinth, CurseForge and in the mod list.", files: [["icon-256","icon"]] },
+];
+const picks = {};
+let db = null;
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function render() {
+  const host = document.getElementById("groups");
+  host.textContent = "";
+  for (const g of GROUPS) {
+    const sec = el("section", "group");
+    sec.append(el("h2", null, g.name), el("p", null, g.note));
+    const row = el("div", "variants");
+    for (let v = 1; v <= 3; v++) {
+      const card = el("div", "variant" + (picks[g.id] === v ? " chosen" : ""));
+      const head = el("div", "vhead");
+      head.append(el("b", null, "Variant " + v));
+      const btn = el("button", "choose", picks[g.id] === v ? "chosen" : "choose");
+      btn.id = "choose-" + g.id + "-" + v;
+      btn.setAttribute("aria-pressed", picks[g.id] === v ? "true" : "false");
+      btn.onclick = () => choose(g.id, v);
+      head.append(btn);
+      card.append(head);
+      const src = f => "tex/" + g.id + "/" + v + "/" + f + ".png";
+      if (g.id === "items") {
+        const tiles = el("div", "tiles");
+        for (const [f, label] of g.files) {
+          const t = el("div", "tile"), s = el("div", "slot"), img = el("img");
+          img.src = src(f); img.alt = label; s.append(img); t.append(s, el("span", null, label)); tiles.append(t);
+        }
+        card.append(tiles);
+      } else if (g.id === "crops") {
+        for (const kind of ["bean", "cabbage"]) {
+          const ground = el("div", "ground");
+          for (let st = 0; st < 4; st++) { const img = el("img"); img.src = src(kind + "_crop_stage" + st); img.alt = kind + " stage " + st; ground.append(img); }
+          card.append(ground);
+        }
+      } else {
+        const box = el("div", "icon"), big = el("img"); big.src = src("icon-256"); big.alt = "mod icon, variant " + v;
+        const small = el("div", "small"), sm = el("img"); sm.src = src("icon-256"); sm.alt = "";
+        small.append(sm, el("span", null, "at mod-list size"));
+        box.append(big, small); card.append(box);
+      }
+      row.append(card);
+    }
+    sec.append(row);
+    host.append(sec);
+  }
+  document.getElementById("count").textContent = Object.keys(picks).length + " of 3 chosen";
+}
+
+async function choose(id, v) {
+  picks[id] = v; render();
+  const save = document.getElementById("save");
+  if (!db) { save.hidden = false; save.textContent = "not saved: sign in to claude.ai to save"; return; }
+  try { await db.doc("picks/" + id).set({ variant: v, at: new Date().toISOString() }); save.hidden = true; }
+  catch (e) { save.hidden = false; save.textContent = "could not save: " + (e && e.code || "error"); }
+}
+
+render();
+(async () => {
+  db = await window.claude?.use?.("db") ?? null;
+  if (!db) return;
+  db.collection("picks").onSnapshot(snap => {
+    for (const d of snap.docs) { const x = d.data(); if (x && x.variant) picks[d.id] = x.variant; }
+    render();
+  }, () => {});
+})();
+</script>
