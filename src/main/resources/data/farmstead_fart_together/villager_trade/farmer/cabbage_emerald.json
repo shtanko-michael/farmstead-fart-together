@@ -11,8 +11,9 @@
   "xp": 10,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "farmstead_fart_together:cabbage"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "farmstead_fart_together:cabbage"
     }
   ],
   "fabric:load_conditions": [

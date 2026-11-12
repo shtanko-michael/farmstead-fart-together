@@ -11,8 +11,9 @@
   "xp": 2,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "farmstead_fart_together:beans"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "farmstead_fart_together:beans"
     }
   ],
   "fabric:load_conditions": [

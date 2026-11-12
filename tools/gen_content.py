@@ -279,7 +279,7 @@ def trades() -> None:
             "wants": {"id": wants[0], "count": wants[1]} if wants[1] > 1 else {"id": wants[0]},
             "gives": {"id": gives[0], "count": gives[1]} if gives[1] > 1 else {"id": gives[0]},
             "max_uses": uses, "reputation_discount": 0.05, "xp": xp,
-            "neoforge:conditions": [{"type": "neoforge:item_exists", "item": i} for i in ours],
+            "neoforge:conditions": [{"type": "neoforge:registered", "registry": "minecraft:item", "value": i} for i in ours],
             "fabric:load_conditions": [{"condition": "fabric:registry_contains", "registry": "minecraft:item", "values": ours}],
         }
         write(DATA / f"villager_trade/farmer/{name}.json", trade)

@@ -10,8 +10,9 @@
   "xp": 5,
   "neoforge:conditions": [
     {
-      "type": "neoforge:item_exists",
-      "item": "farmstead_fart_together:bowl_of_beans"
+      "type": "neoforge:registered",
+      "registry": "minecraft:item",
+      "value": "farmstead_fart_together:bowl_of_beans"
     }
   ],
   "fabric:load_conditions": [
