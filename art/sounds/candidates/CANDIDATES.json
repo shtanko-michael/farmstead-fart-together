@@ -46,7 +46,7 @@
           "prompt": "A quick little rubbery whoopee cushion 'prrt', snappy and light. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.0,
           "requestedSeconds": 1.0,
-          "credits": 0
+          "credits": null
         }
       ]
     },
@@ -96,7 +96,7 @@
           "prompt": "A thin squeaky toot from a rubber balloon, rising in pitch at the end. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.2,
           "requestedSeconds": 1.2,
-          "credits": 0
+          "credits": null
         }
       ]
     },
@@ -146,7 +146,7 @@
           "prompt": "A wobbly rubbery flutter, like a whoopee cushion with bubbles, bouncy and silly. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.36,
           "requestedSeconds": 1.4,
-          "credits": 0
+          "credits": null
         }
       ]
     },
@@ -196,7 +196,7 @@
           "prompt": "A long slow balloon deflating with a wavering rubbery tone, ending with a tiny squeak. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 2.48,
           "requestedSeconds": 2.5,
-          "credits": 0
+          "credits": null
         }
       ]
     },
@@ -246,7 +246,7 @@
           "prompt": "A silly short trombone 'bwap', one low comedic brass note. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.28,
           "requestedSeconds": 1.3,
-          "credits": 0
+          "credits": null
         }
       ]
     },
@@ -296,7 +296,7 @@
           "prompt": "A very small soft peep of air from a squeezed rubber duck, cute and quiet. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 0.8,
           "requestedSeconds": 0.8,
-          "credits": 0
+          "credits": null
         }
       ]
     },
@@ -346,7 +346,7 @@
           "prompt": "A big low rubbery 'brrrp' from a giant whoopee cushion, deep and bouncy. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.6,
           "requestedSeconds": 1.6,
-          "credits": 0
+          "credits": null
         }
       ]
     },
@@ -396,11 +396,16 @@
           "prompt": "A soft short whoosh of air from a small bellows, gentle and clean. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 0.88,
           "requestedSeconds": 0.9,
-          "credits": 0
+          "credits": null
         }
       ]
     }
   },
-  "note": "Choose one take per slot, then set it in art/sounds/slots.json and run `python -I tools/sounds.py install`. Takes 1-4 share a prompt (different seeds), take 5 is a variation. credits = the subscription's character count before/after the call; null means it was not measured (generated before measuring was added).",
-  "creditsMeasured": 0
+  "note": "Choose one take per slot, then set it in art/sounds/slots.json and run `python -I tools/sounds.py install`. Takes 1-4 share a prompt (different seeds), take 5 is a variation. Per-take credits are not reported by the CLI and the subscription counter lags, so only totals are known: the eight take-5 generations moved it 15124 -> 15331 (207 credits, ~26 per take); all 40 takes cost about 1,050 credits (estimate from that rate).",
+  "credits": {
+    "measuredTake5": 207,
+    "estimatedAll40": 1050,
+    "subscriptionUsedAfter": 15331,
+    "subscriptionLimit": 45926
+  }
 }
