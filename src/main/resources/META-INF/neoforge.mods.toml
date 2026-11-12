@@ -1,0 +1,26 @@
+license = "MIT"
+issueTrackerURL = "${issues}"
+
+modLoader = "javafml"
+loaderVersion = "[1,)"
+
+[[mods]]
+modId = "${id}"
+displayName = "${name}"
+version = "${version}"
+authors = "Farmstead"
+displayURL = "${homepage}"
+description = '''Toot with style: animated poses, gas clouds and handcrafted sounds. Charge up on beans, scare mobs, jet-jump and pull off team combos with friends. Family-friendly by default.'''
+${icon_key} = "assets/farmstead_fart_together/icon.png"
+# Scaffold: no registries or packets yet, so either side may lack it. Revisit when items and payloads land.
+displayTest = "IGNORE_ALL_VERSION"
+
+[[mixins]]
+config = "farmstead_fart_together.mixins.json"
+
+[[dependencies.${id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft}"
+ordering = "NONE"
+side = "BOTH"

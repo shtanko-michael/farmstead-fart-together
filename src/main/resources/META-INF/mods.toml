@@ -1,0 +1,22 @@
+license = "MIT"
+issueTrackerURL = "${issues}"
+
+modLoader = "javafml"
+loaderVersion = "[47,)"
+
+[[mods]]
+modId = "${id}"
+displayName = "${name}"
+version = "${version}"
+authors = "Farmstead"
+displayURL = "${homepage}"
+description = '''Toot with style: animated poses, gas clouds and handcrafted sounds. Charge up on beans, scare mobs, jet-jump and pull off team combos with friends. Family-friendly by default.'''
+logoFile = "assets/farmstead_fart_together/icon.png"
+displayTest = "IGNORE_ALL_VERSION"
+
+[[dependencies.${id}]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft}"
+ordering = "NONE"
+side = "BOTH"

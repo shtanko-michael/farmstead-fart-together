@@ -1,0 +1,27 @@
+package online.farmsteadminecraft.farttogether.platform.forge;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.fml.ModLoadingContext;
+import online.farmsteadminecraft.farttogether.client.FartTogetherClient;
+import online.farmsteadminecraft.farttogether.client.FartTogetherCommands;
+
+final class ForgeClientHooks {
+    private ForgeClientHooks() {
+    }
+
+    static void register() {
+        FartTogetherClient.init();
+        ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
+            () -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> FartTogetherClient.configScreen(parent)));
+        MinecraftForge.EVENT_BUS.addListener((RegisterClientCommandsEvent event) ->
+            event.getDispatcher().register(FartTogetherCommands.<CommandSourceStack>build()));
+        MinecraftForge.EVENT_BUS.addListener((TickEvent.ClientTickEvent event) -> {
+            if (event.phase == TickEvent.Phase.END) FartTogetherClient.tick(Minecraft.getInstance());
+        });
+    }
+}

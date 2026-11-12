@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Toot with style: animated poses, gas clouds and handcrafted sounds. Charge up on beans, scare mobs, jet-jump and pull off team combos with friends. Family-friendly by default.",
+  "authors": ["Farmstead"],
+  "contact": {
+    "homepage": "${homepage}",
+    "sources": "${sources}",
+    "issues": "${issues}"
+  },
+  "license": "MIT",
+  "icon": "assets/farmstead_fart_together/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["online.farmsteadminecraft.farttogether.platform.fabric.FartTogetherFabric"],
+    "client": ["online.farmsteadminecraft.farttogether.platform.fabric.FartTogetherFabricClient"],
+    "modmenu": ["online.farmsteadminecraft.farttogether.platform.fabric.FartTogetherModMenu"]
+  },
+  "mixins": [
+    "farmstead_fart_together.mixins.json",
+    {"config": "farmstead_fart_together.fabric.mixins.json", "environment": "client"}
+  ],
+  "accessWidener": "farmstead_fart_together.ct",
+  "depends": {
+    "fabricloader": ">=${loader}",
+    "minecraft": "${minecraft}"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
