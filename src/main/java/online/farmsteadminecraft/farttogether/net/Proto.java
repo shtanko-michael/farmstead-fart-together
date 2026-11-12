@@ -17,23 +17,23 @@ import online.farmsteadminecraft.farttogether.style.Style;
  * mismatch both sides behave as if the other had no mod.</p>
  */
 public final class Proto {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     /** No message of ours is anywhere near this; anything larger is dropped unread. */
     public static final int MAX_BYTES = 512;
 
-    private static final int HELLO = 0, TOOT = 1, STYLE = 2;
+    private static final int HELLO = 0, TOOT = 1, STYLE = 2, CHARGE = 3;
 
     private Proto() {
     }
 
     public sealed interface ToServer permits HelloC2S, TootC2S, StyleC2S {}
 
-    public sealed interface ToClient permits HelloS2C, TootS2C, StyleS2C {}
+    public sealed interface ToClient permits HelloS2C, TootS2C, StyleS2C, ChargeS2C {}
 
     /** First message of a modded client: its protocol version and its style. */
     public record HelloC2S(int version, Style style) implements ToServer {}
 
-    /** "Toot now"; {@code power} is 0 (M1 has one strength; charge levels come with M2). */
+    /** "Toot now"; {@code power} is unused (0): the server takes the strength from the player's gas. */
     public record TootC2S(int power) implements ToServer {}
 
     /** The player changed their style. */
@@ -42,8 +42,16 @@ public final class Proto {
     /** The server's answer to hello: its version and the toot cooldown, so the client does not spam the key. */
     public record HelloS2C(int version, int cooldownMillis) implements ToClient {}
 
-    /** Player {@code who} tooted; {@code seed} makes every receiver pick the same sound and cloud. */
-    public record TootS2C(UUID who, int power, long seed) implements ToClient {}
+    /**
+     * Player {@code who} tooted with strength {@code power} (0 small .. 3 full meter); {@code seed} makes every
+     * receiver pick the same sound and cloud. The gas cloud stays at {@code x y z} with {@code radius} for
+     * {@code lingerTicks} (0: no cloud).
+     */
+    public record TootS2C(UUID who, int power, long seed, float x, float y, float z, float radius, int lingerTicks)
+        implements ToClient {}
+
+    /** This player's gas: {@code charge} of {@code max}; a toot needs {@code min} (0 when gas is not required). */
+    public record ChargeS2C(int charge, int max, int min, boolean enabled) implements ToClient {}
 
     /** The (server-clamped) style of player {@code who}. */
     public record StyleS2C(UUID who, Style style) implements ToClient {}
@@ -76,6 +84,17 @@ public final class Proto {
             buf.writeUUID(m.who());
             buf.writeVarInt(m.power());
             buf.writeLong(m.seed());
+            buf.writeFloat(m.x());
+            buf.writeFloat(m.y());
+            buf.writeFloat(m.z());
+            buf.writeFloat(m.radius());
+            buf.writeVarInt(m.lingerTicks());
+        } else if (msg instanceof ChargeS2C m) {
+            buf.writeByte(CHARGE);
+            buf.writeVarInt(m.charge());
+            buf.writeVarInt(m.max());
+            buf.writeVarInt(m.min());
+            buf.writeBoolean(m.enabled());
         } else if (msg instanceof StyleS2C m) {
             buf.writeByte(STYLE);
             buf.writeUUID(m.who());
@@ -106,8 +125,10 @@ public final class Proto {
         try {
             return switch (buf.readByte()) {
                 case HELLO -> new HelloS2C(buf.readVarInt(), buf.readVarInt());
-                case TOOT -> new TootS2C(buf.readUUID(), buf.readVarInt(), buf.readLong());
+                case TOOT -> new TootS2C(buf.readUUID(), buf.readVarInt(), buf.readLong(), buf.readFloat(), buf.readFloat(),
+                    buf.readFloat(), buf.readFloat(), buf.readVarInt());
                 case STYLE -> new StyleS2C(buf.readUUID(), Style.read(buf));
+                case CHARGE -> new ChargeS2C(buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean());
                 default -> null;
             };
         } catch (RuntimeException e) {

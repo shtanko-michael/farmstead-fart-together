@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "farmstead_fart_together:block/bean_crop_stage0"
+    },
+    "age=1": {
+      "model": "farmstead_fart_together:block/bean_crop_stage0"
+    },
+    "age=2": {
+      "model": "farmstead_fart_together:block/bean_crop_stage1"
+    },
+    "age=3": {
+      "model": "farmstead_fart_together:block/bean_crop_stage1"
+    },
+    "age=4": {
+      "model": "farmstead_fart_together:block/bean_crop_stage2"
+    },
+    "age=5": {
+      "model": "farmstead_fart_together:block/bean_crop_stage2"
+    },
+    "age=6": {
+      "model": "farmstead_fart_together:block/bean_crop_stage2"
+    },
+    "age=7": {
+      "model": "farmstead_fart_together:block/bean_crop_stage3"
+    }
+  }
+}

@@ -8,6 +8,7 @@ import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
 import online.farmsteadminecraft.farttogether.FartTogether;
 import online.farmsteadminecraft.farttogether.ModLoaderAccess;
+import online.farmsteadminecraft.farttogether.server.Meta;
 import online.farmsteadminecraft.farttogether.server.Perm;
 
 final class ForgeLoaderAccess implements ModLoaderAccess {
@@ -32,22 +33,39 @@ final class ForgeLoaderAccess implements ModLoaderAccess {
     }
 
     private static final java.util.Map<Perm, PermissionNode<Boolean>> NODES = new java.util.EnumMap<>(Perm.class);
+    private static final java.util.Map<Meta, PermissionNode<String>> META = new java.util.EnumMap<>(Meta.class);
 
     static {
         for (Perm perm : Perm.values()) {
             NODES.put(perm, new PermissionNode<>(FartTogether.MOD_ID, perm.name, PermissionTypes.BOOLEAN,
-                (player, uuid, context) -> perm.def));
+                (player, uuid, context) -> perm.byDefault(player)));
+        }
+        for (Meta meta : Meta.values()) {
+            META.put(meta, new PermissionNode<>(FartTogether.MOD_ID, meta.name, PermissionTypes.STRING,
+                (player, uuid, context) -> ""));
         }
     }
 
     /** Registered in PermissionGatherEvent.Nodes; LuckPerms then lists them as farmstead_fart_together.*. */
     static java.util.List<PermissionNode<?>> nodes() {
-        return new java.util.ArrayList<>(NODES.values());
+        java.util.List<PermissionNode<?>> out = new java.util.ArrayList<>(NODES.values());
+        out.addAll(META.values());
+        return out;
     }
 
     @Override
     public boolean permission(ServerPlayer player, Perm perm) {
         return PermissionAPI.getPermission(player, NODES.get(perm));
+    }
+
+    @Override
+    public String meta(ServerPlayer player, Meta meta) {
+        try {
+            String v = PermissionAPI.getPermission(player, META.get(meta));
+            return v == null || v.isBlank() ? null : v;
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     @Override

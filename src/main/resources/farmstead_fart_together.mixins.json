@@ -3,6 +3,7 @@
   "package": "online.farmsteadminecraft.farttogether.mixin",
   "compatibilityLevel": "${java}",
   "mixins": [
+    "LivingEntityMixin"
   ],
   "client": [
     "HumanoidModelMixin"${extraClient}

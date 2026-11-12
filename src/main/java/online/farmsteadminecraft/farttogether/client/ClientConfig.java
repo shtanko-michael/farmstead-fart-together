@@ -38,6 +38,10 @@ public final class ClientConfig {
 
     public static final DoubleValue PARTICLES = FILE.number("particles", "amount", 1.0, 0.0, 3.0)
         .comment("How many cloud particles to draw. 0 hides the cloud for you only.");
+    public static final BoolValue LINGER = FILE.bool("particles", "lingeringClouds", true)
+        .comment("Draw the gas cloud a toot leaves behind for a few seconds (yours and other players').");
+    public static final BoolValue GAS_METER = FILE.bool("general", "gasMeter", true)
+        .comment("Show the gas meter above the hotbar while you have gas (on servers that run the mod).");
     public static final IntValue MAX_PER_TOOT = FILE.integer("particles", "maxPerToot", 200, 10, 1000)
         .comment("Most particles one toot of another player may draw on your screen (weak PCs).");
 

@@ -30,6 +30,10 @@ public final class ClientNet {
     private static long lastStyleSent;
     private static boolean styleDirty;
     private static Object world;
+    /** The last gas the server told us; {@code chargeMax} 0 = not known (no modded server). */
+    private static int charge, chargeMax, chargeMin;
+    private static boolean tootEnabled = true;
+    private static long lastRefusal;
     private static final Map<UUID, Style> STYLES = new HashMap<>();
     private static final Random RANDOM = new Random();
 
@@ -69,6 +73,8 @@ public final class ClientNet {
         helloSent = false;
         serverVersion = 0;
         styleDirty = false;
+        charge = chargeMax = chargeMin = 0;
+        tootEnabled = true;
         STYLES.clear();
     }
 
@@ -82,6 +88,20 @@ public final class ClientNet {
         if (mc.player == null) return;
         long now = now();
         if (serverHasMod()) {
+            if (!tootEnabled || charge < chargeMin) {
+                // say why nothing happens (not more than once a second for a held key)
+                if (now - lastRefusal > 1000) {
+                    lastRefusal = now;
+                    var text = net.minecraft.network.chat.Component.translatableWithFallback(
+                        tootEnabled ? "message.farmstead_fart_together.no_gas" : "message.farmstead_fart_together.disabled",
+                        tootEnabled ? "Not enough gas: eat something first (beans work best)" : "Toots are switched off for you on this server");
+                    //? if >=26.1 {
+                    /*mc.player.sendOverlayMessage(text);
+                    *///?} else
+                    mc.player.displayClientMessage(text, true);
+                }
+                return;
+            }
             if (hasTooted && now - lastToot < cooldownMillis) return;
             hasTooted = true;
             lastToot = now;
@@ -90,8 +110,13 @@ public final class ClientNet {
             if (hasTooted && now - lastToot < LOCAL_COOLDOWN_MILLIS) return;
             hasTooted = true;
             lastToot = now;
-            Toots.play(mc, mc.player, ClientConfig.style(), RANDOM.nextLong(), true);
+            Toots.play(mc, mc.player, ClientConfig.style(), RANDOM.nextLong(), true, 1, null, 0, 0);
         }
+    }
+
+    /** Gas for the HUD meter: {@code [charge, max, min]}, max 0 when the server does not run the mod. */
+    public static int[] gas() {
+        return new int[]{charge, chargeMax, chargeMin};
     }
 
     public static void receive(byte[] data) {
@@ -105,12 +130,19 @@ public final class ClientNet {
         } else if (msg instanceof Proto.StyleS2C style) {
             STYLES.put(style.who(), style.style());
             if (TestHooks.enabled()) FartTogether.LOGGER.info("test: style of {} = {}", style.who(), style.style());
+        } else if (msg instanceof Proto.ChargeS2C c) {
+            charge = c.charge();
+            chargeMax = c.max();
+            chargeMin = c.min();
+            tootEnabled = c.enabled();
+            if (TestHooks.enabled()) FartTogether.LOGGER.info("test: charge {}/{} min {} enabled {}", charge, chargeMax, chargeMin, tootEnabled);
         } else if (msg instanceof Proto.TootS2C toot) {
             if (mc.level == null || mc.player == null) return;
             Player who = mc.level.getPlayerByUUID(toot.who());
             if (who == null) return;
             boolean own = who == mc.player;
-            Toots.play(mc, who, styleFor(mc, toot.who(), own), toot.seed(), own);
+            Toots.play(mc, who, styleFor(mc, toot.who(), own), toot.seed(), own, toot.power(),
+                new net.minecraft.world.phys.Vec3(toot.x(), toot.y(), toot.z()), toot.radius(), toot.lingerTicks());
         }
     }
 

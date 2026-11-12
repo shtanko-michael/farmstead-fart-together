@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bowl",
+    "farmstead_fart_together:beans",
+    "farmstead_fart_together:beans",
+    "farmstead_fart_together:beans"
+  ],
+  "result": {
+    "count": 1,
+    "id": "farmstead_fart_together:bowl_of_beans"
+  }
+}

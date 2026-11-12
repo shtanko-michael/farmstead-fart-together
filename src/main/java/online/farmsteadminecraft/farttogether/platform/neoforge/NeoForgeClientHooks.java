@@ -5,10 +5,14 @@ import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
+import online.farmsteadminecraft.farttogether.FartTogether;
 import online.farmsteadminecraft.farttogether.client.FartTogetherClient;
 import online.farmsteadminecraft.farttogether.client.FartTogetherCommands;
+import online.farmsteadminecraft.farttogether.client.GasHud;
 import online.farmsteadminecraft.farttogether.client.Keys;
 
 final class NeoForgeClientHooks {
@@ -23,5 +27,7 @@ final class NeoForgeClientHooks {
         NeoForge.EVENT_BUS.addListener((RegisterClientCommandsEvent event) ->
             event.getDispatcher().register(FartTogetherCommands.<CommandSourceStack>build()));
         modBus.addListener((net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent event) -> event.register(Keys.TOOT));
+        modBus.addListener((RegisterGuiLayersEvent event) ->
+            event.registerAbove(VanillaGuiLayers.HOTBAR, FartTogether.id("gas_meter"), (g, delta) -> GasHud.render(g)));
     }
 }

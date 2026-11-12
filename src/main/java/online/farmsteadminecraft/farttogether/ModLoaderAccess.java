@@ -25,6 +25,12 @@ public interface ModLoaderAccess {
      */
     boolean permission(net.minecraft.server.level.ServerPlayer player, online.farmsteadminecraft.farttogether.server.Perm perm);
 
+    /**
+     * A number option of the permission mod (LuckPerms meta {@code farmstead_fart_together.<name>}) as text, or null
+     * when no permission mod sets it; the caller falls back to the server file.
+     */
+    String meta(net.minecraft.server.level.ServerPlayer player, online.farmsteadminecraft.farttogether.server.Meta meta);
+
     /** The game's config folder ({@code .minecraft/config}). */
     java.nio.file.Path configDir();
 

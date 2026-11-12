@@ -96,6 +96,9 @@ java {
 
 tasks {
     processResources {
+        // data files are written for 1.21.2+; older targets get their folder names and recipe shapes (buildSrc)
+        inputs.property("dataCompat", sc.current.version)
+        dataCompat(sc.current.version)
         val modId = sc.properties["mod.id"]
         fun MutableMap<String, String>.register(key: String, value: String) {
             inputs.property(key, value)

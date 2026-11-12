@@ -8,19 +8,62 @@ import online.farmsteadminecraft.farttogether.ModLoaderAccess;
 import online.farmsteadminecraft.farttogether.config.BoolValue;
 import online.farmsteadminecraft.farttogether.config.ConfigFile;
 import online.farmsteadminecraft.farttogether.config.DoubleValue;
+import online.farmsteadminecraft.farttogether.config.IntValue;
 import online.farmsteadminecraft.farttogether.config.StringListValue;
 import online.farmsteadminecraft.farttogether.style.Sounds;
 import online.farmsteadminecraft.farttogether.style.Style;
 
 /**
  * {@code config/farmstead_fart_together-server.toml}: the rules of the server (or of the single-player world).
- * Gameplay keys beyond the toot itself (charge, cloud, jet jump, combos) arrive with M2/M3, see PLAN.md section 5.
+ * {@code /fart reload} reads it again. Jet jump and team combos arrive with M3, see PLAN.md section 5.
  */
 public final class ServerConfig {
     public static final ConfigFile FILE = new ConfigFile(FartTogether.MOD_ID, "server", 1);
 
     public static final DoubleValue COOLDOWN = FILE.number("toot", "cooldownSeconds", 3.0, 0.0, 120.0)
-        .comment("Seconds a player waits between two toots.");
+        .comment("Seconds a player waits between two toots. LuckPerms meta farmstead_fart_together.cooldown overrides it per player or group.");
+
+    public static final BoolValue CHARGE_REQUIRED = FILE.bool("charge", "required", true)
+        .comment("A toot needs gas, which comes from food. Off: everyone can always toot at medium strength.");
+    public static final IntValue CHARGE_MAX = FILE.integer("charge", "max", 100, 10, 1000)
+        .comment("Most gas a player can hold. LuckPerms meta farmstead_fart_together.charge.max overrides it.");
+    public static final IntValue CHARGE_MIN = FILE.integer("charge", "minToToot", 10, 1, 1000)
+        .comment("Gas a toot needs at least. A toot lets out all the gas the player has; more gas = a stronger toot.");
+    public static final DoubleValue PASSIVE = FILE.number("charge", "passivePerMinute", 0.0, 0.0, 100.0)
+        .comment("Gas every player gains each minute without eating.");
+    public static final IntValue UNLISTED_FOOD = FILE.integer("charge", "unlistedFood", 2, 0, 100)
+        .comment("Gas from a food that no gas_foods file lists (modded food, for example). Weights live in data/<namespace>/gas_foods/*.json and datapacks can change them.");
+
+    public static final BoolValue CLOUD = FILE.bool("cloud", "enabled", true)
+        .comment("A toot leaves a gas cloud behind that lingers for a while.");
+    public static final DoubleValue CLOUD_SECONDS = FILE.number("cloud", "durationSeconds", 8.0, 1.0, 60.0)
+        .comment("How long a full-strength cloud lingers (weaker toots: shorter).");
+    public static final DoubleValue CLOUD_RADIUS = FILE.number("cloud", "radius", 2.5, 0.5, 8.0)
+        .comment("Radius of a full-strength cloud in blocks. LuckPerms meta farmstead_fart_together.cloud.radius overrides it.");
+    public static final BoolValue SCARE = FILE.bool("cloud", "scareMobs", true)
+        .comment("Mobs in scaredMobs run away from a cloud (and stop chasing whoever is in it).");
+    public static final DoubleValue SCARE_RANGE = FILE.number("cloud", "scareRange", 4.0, 0.0, 16.0)
+        .comment("How far beyond the cloud's radius mobs smell it.");
+    public static final StringListValue SCARED = FILE.list("cloud", "scaredMobs", List.of(
+            "minecraft:zombie", "minecraft:husk", "minecraft:drowned", "minecraft:zombie_villager", "minecraft:skeleton",
+            "minecraft:stray", "minecraft:creeper", "minecraft:spider", "minecraft:cave_spider", "minecraft:witch",
+            "minecraft:pillager", "minecraft:vindicator", "minecraft:piglin", "minecraft:hoglin", "minecraft:enderman",
+            "minecraft:cow", "minecraft:pig", "minecraft:sheep", "minecraft:chicken", "minecraft:rabbit",
+            "minecraft:villager", "minecraft:wandering_trader", "minecraft:fox", "minecraft:wolf", "minecraft:cat"))
+        .comment("Mobs that flee from a cloud: ids or #tags (#minecraft:skeletons). Bosses and mobs without legs ignore it anyway.");
+    public static final StringListValue EFFECTS = FILE.list("cloud", "effects", List.of())
+        .comment("Effects for living things inside a cloud, as \"<effect id> <seconds> <level>\", e.g. \"minecraft:nausea 4 1\". Empty: the cloud is harmless.");
+    public static final BoolValue CLOUD_PLAYERS = FILE.bool("cloud", "affectsPlayers", false)
+        .comment("Whether cloud effects reach other players (the one who tooted never gets them). Off by default: no PvP.");
+    public static final BoolValue RESPECT_PVP = FILE.bool("cloud", "respectServerPvp", true)
+        .comment("With affectsPlayers on, still spare players when the server has PvP switched off.");
+
+    public static final BoolValue ITEMS = FILE.bool("items", "enabled", true)
+        .comment("Dedicated servers: register beans and cabbage (needs a restart). Off: the mod adds nothing to the registries, so players without the mod can join too.");
+    public static final DoubleValue BEANS_FROM_GRASS = FILE.number("items", "beansFromGrass", 0.05, 0.0, 1.0)
+        .comment("Chance that breaking grass or a fern drops beans.");
+    public static final DoubleValue CABBAGE_FROM_GRASS = FILE.number("items", "cabbageSeedsFromGrass", 0.04, 0.0, 1.0)
+        .comment("Chance that breaking grass or a fern drops cabbage seeds.");
 
     public static final BoolValue ALLOW_CUSTOM = FILE.bool("style", "allowCustom", true)
         .comment("Let players use their own style (colour, particles, sound, pose). Off: everyone looks plain.");
@@ -39,8 +82,12 @@ public final class ServerConfig {
         .comment("How often a player may change their style.");
 
     static {
-        FILE.preset("family", Map.of("toot.cooldownSeconds", 5.0))
-            .preset("plain", Map.of("style.allowCustom", false));
+        SCARED.picker(StringListValue.Picker.ENTITIES);
+        FILE.preset("family", Map.of("toot.cooldownSeconds", 5.0, "cloud.effects", "[]"))
+            .preset("plain", Map.of("style.allowCustom", false))
+            .preset("chaos", Map.of("toot.cooldownSeconds", 1.0, "charge.minToToot", 5, "charge.passivePerMinute", 10.0,
+                "cloud.durationSeconds", 15.0, "cloud.radius", 4.0, "cloud.effects", "[\"minecraft:nausea 5 1\"]",
+                "cloud.affectsPlayers", true));
     }
 
     private ServerConfig() {
