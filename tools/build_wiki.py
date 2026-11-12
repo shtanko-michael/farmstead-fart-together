@@ -162,6 +162,7 @@ def site_gallery(md):
                     caps = [c.strip() for c in lines[j + 1].strip().strip("|").split("|")] if j + 1 < len(lines) else []
                     for k, (alt, src) in enumerate(imgs):
                         cap = caps[k] if k < len(caps) else alt
+                        cap = cap.replace("**", "").strip()
                         figs.append(f'<figure><img src="{src}" alt="{alt}" loading="lazy"><figcaption>{cap}</figcaption></figure>')
                     j += 2
                 else:
@@ -175,7 +176,7 @@ def site_gallery(md):
         out.append(lines[i])
         i += 1
     text = "\n".join(out)
-    text = re.sub(r"(?m)^(More pictures in|Больше картинок в) \[[^\]]*\]\([^)]*\)\.?$",
+    text = re.sub(r"(?m)^(More pictures in|Больше картинок —? ?в) \[[^\]]*\]\([^)]*\)\.?$",
                   lambda m: ("More pictures in the " if m.group(1).startswith("More") else "Больше картинок в ")
                   + f"[{'gallery' if m.group(1).startswith('More') else 'галерее'}]({REPO}/tree/main/docs/media/gallery).", text)
     return text
