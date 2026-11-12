@@ -1,0 +1,17 @@
+A pixel-art sprite sheet of eight Minecraft crop block textures, 1536x1024 landscape.
+
+Layout: a 4 x 2 grid of equal cells on ONE FLAT SOLID MAGENTA BACKGROUND (#FF00FF) everywhere: no gradient, no glow, no vignette, no shadow, no ground, no soil, no farmland, no pot, no grid lines, no frames. No text, no numbers, no labels.
+
+Every sprite is a real 16x16 Minecraft crop texture drawn big: 16 x 16 large square pixels, each pixel exactly one flat colour, hard edges, no anti-aliasing, no blur. All eight use the SAME pixel size. Like vanilla wheat, carrots, potatoes and beetroots: the plants stand on the bottom edge of their 16x16 square and grow upward, several thin stems across the width with gaps between them, 3-4 greens, light from the top. A young stage is a SHORT sprite at the bottom of its square, a ripe stage fills the whole square.
+
+Top row, left to right, a bush bean crop:
+1. Stage 0: tiny sprouts, two or three pairs of small leaves, only 4 pixels tall.
+2. Stage 1: young plants with a few leaves, 8 pixels tall.
+3. Stage 2: bushy leafy plants, 12 pixels tall, a few small white flowers.
+4. Stage 3 (ripe): full 16 pixels tall leafy bush with several hanging long green bean pods showing brown-red beans.
+
+Bottom row, left to right, a cabbage crop:
+5. Stage 0: tiny pale green sprouts, 3 pixels tall.
+6. Stage 1: a small rosette of a few round leaves, 6 pixels tall.
+7. Stage 2: a loose low rosette of broad leaves with a small head starting in the middle, 9 pixels tall.
+8. Stage 3 (ripe): a big round firm cabbage head sitting on the bottom edge with wide outer leaves around it, 12 pixels tall, 16 wide.

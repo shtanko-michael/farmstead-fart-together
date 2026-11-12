@@ -1,0 +1,11 @@
+Square app icon for a family-friendly Minecraft mod called "Fart Together", 1024x1024 pixels.
+
+Style: Minecraft pixel art. Crisp square pixels, a limited palette, flat shading in a few steps, no smooth gradients, no anti-aliasing blur, no photorealism. Cheerful cartoon humour, nothing gross.
+
+Composition: three blocky Minecraft-style player characters seen from behind at three-quarter angle, standing side by side in a row, slightly bent forward, laughing; together they puff out one big shared round cloud of bright lime green gas (#7FBF3F to #B6E36A) that rises between and above them and fills the top half of the icon. A few tiny pixel sparkles and two little green bean pods in the cloud. Their clothes in three clearly different colours (blue, orange, purple).
+
+Background: a dark warm night (#14180f at the corners to #2a3320 behind the figures), a soft round glow behind the cloud.
+
+Must read clearly at 64x64: big shapes, strong contrast, the green cloud is the dominant shape.
+
+No text, no letters, no numbers, no logo, no frame or border, no watermark.

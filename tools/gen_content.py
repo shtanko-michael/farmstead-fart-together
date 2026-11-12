@@ -1,4 +1,4 @@
-"""Beans and cabbage: placeholder textures (procedural pixel art until the real art is drawn, PLAN.md section 8)
+"""Beans and cabbage: placeholder textures (procedural pixel art, only drawn where a texture is missing: the real ones come from tools/art.py)
 and every JSON the items, crops and gas need.
 
     python -I tools/gen_content.py            # models, blockstates, loot, recipe, gas foods (+ missing textures)

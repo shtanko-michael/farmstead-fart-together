@@ -1,0 +1,13 @@
+A pixel-art sprite sheet of six Minecraft item textures, 1536x1024 landscape.
+
+Layout: a 3 x 2 grid of equal cells on ONE FLAT SOLID MAGENTA BACKGROUND (#FF00FF) everywhere: no gradient, no glow, no vignette, no shadow, no texture, no grid lines, no frames. One sprite centred in each cell, about 60% of the cell, with clean magenta all around it. No text, no numbers, no labels.
+
+Every sprite is a real 16x16 Minecraft texture drawn big: 16 x 16 large square pixels, each pixel exactly one flat colour, hard edges, no anti-aliasing, no gradients, no blur. A 1-pixel darker outline around each shape, 3-4 shades per material, light from the top left, seen from the front like vanilla potato, beetroot, wheat seeds and mushroom stew icons.
+
+Cells, left to right, top row then bottom row:
+1. Beans: a small heap of five or six plump kidney-shaped brown-red beans, each with a light highlight pixel.
+2. Cabbage seeds: four or five small pale yellow-green seeds scattered like vanilla wheat seeds.
+3. Cabbage: one round green head of cabbage with curled outer leaves and lighter veins, darker green base.
+4. Bowl of beans: a vanilla-style brown wooden bowl (like the mushroom stew bowl) heaped with brown-red beans in sauce.
+5. Gas meter icon, only 9 x 9 large pixels (same pixel size as the others, so a smaller sprite): a small round puffy lime-green gas cloud, readable like the Minecraft heart and food HUD icons, dark outline.
+6. Full gas meter icon, 9 x 9 large pixels: the same cloud shape in shining gold and yellow, with one white sparkle pixel.
