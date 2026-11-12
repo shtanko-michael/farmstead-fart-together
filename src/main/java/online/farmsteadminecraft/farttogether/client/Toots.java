@@ -132,7 +132,7 @@ public final class Toots {
         // one big merged cloud spanning the players: many large soft puffs filling a flattened dome around the centre,
         // rising slowly and fading over three to four seconds (several times the volume of a single toot)
         // the dome hugs the players: about the server's area, a little tighter so a camera next to them stays outside
-        double r = Math.min(6.0, Math.max(2.0, (radius > 0 ? radius : 2.5 + count) * 0.7));
+        double r = Math.min(5.0, Math.max(2.0, (radius > 0 ? radius : 2.5 + count) * 0.7));
         // the players' colours, pulled towards the gas green so the shared cloud still reads as gas
         int gas = Colors.lerp(color, Style.DEFAULT_COLOR, 0.45f);
         int puffs = Math.round(Math.min(160, 30 + 22 * count) * ClientConfig.PARTICLES.floatValue());
