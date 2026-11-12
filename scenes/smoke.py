@@ -39,6 +39,14 @@ def run(ctx):
     hook(ctx, "try.it")
     ctx.wait(0.35)
     ctx.shot("smoke-puff")
+    # the real toot: key path -> server (hello, cooldown) -> broadcast back -> pose, cloud, sound
+    ctx.wait(1.5)
+    ctx.cmd(f"tp {p} 0.5 {Y} 0.5 90 10")
+    hook(ctx, "camera", "front")
+    ctx.wait(1)
+    hook(ctx, "toot")
+    ctx.wait(0.4)
+    ctx.shot("smoke-toot")
     hook(ctx, "camera", "first")
     hook(ctx, "config.open")
     ctx.wait(1.5)
@@ -52,6 +60,8 @@ def run(ctx):
         f"server start-up line: {started.search(server).group(0) if started.search(server) else 'MISSING'}",
         f"client config file {CFG}: {'present' if cfg.exists() else 'MISSING'}",
         f"client command /farttogether reload: {'ok' if 'Fart Together settings reloaded' in client else 'no chat line'}",
+        f"handshake (server answered hello): {'yes' if 'server runs Fart Together protocol' in client else 'NO'}",
+        f"toot played from the server's broadcast: {'yes' if re.search(r'test: toot by \w+ .* own=true', client) else 'NO'}",
     ]
     errors = [l.strip() for l in (client + server).splitlines()
               if ("/ERROR]" in l or "Exception" in l) and ("fart" in l.lower() or "mixin" in l.lower())]
