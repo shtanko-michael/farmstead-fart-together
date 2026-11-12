@@ -59,6 +59,26 @@ V2: dict[str, list[str]] = {
         "A small quick fart, a single tiny pop of air",
         "A tiny polite fart, barely audible, short",
     ],
+    "short": [
+        "A short quick fart, a single crisp 'pfft', everyday and funny",
+        "A quick snappy fart, one short burst",
+        "A short punchy fart with a little flutter at the end",
+    ],
+    "bubbly": [
+        "A bubbly fluttering fart, wet-sounding wobble of many tiny bursts",
+        "A wobbly rippling fart, a fast flutter like a motorboat, short and silly",
+        "A bubbly fart in a bathtub, gurgling bubbles rising, funny",
+    ],
+    "trumpet": [
+        "A loud trumpeting fart, a brassy honk like a horn, proud and comic",
+        "A booming fart that sounds like a tuba blast, one big brassy note",
+        "A fanfare-like fart, two quick honks and a long brassy note",
+    ],
+    "rumble": [
+        "A deep low rumbling fart, powerful and bassy, short",
+        "A huge thunderous fart, low rumble with a rattle, comic and loud",
+        "A deep growling fart that rattles, very low pitch, about a second and a half",
+    ],
     "puff": [
         "A soft silent-but-deadly fart, a quiet airy hiss of gas with no tone",
         "A gentle muffled fart, soft and airy, more breath than sound",

@@ -46,7 +46,34 @@
           "prompt": "A quick little rubbery whoopee cushion 'prrt', snappy and light. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.0,
           "requestedSeconds": 1.0,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "short/short-6.ogg",
+          "mp3": "short/short-6.mp3",
+          "prompt": "A short quick fart, a single crisp 'pfft', everyday and funny. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.0,
+          "requestedSeconds": 1.0,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "short/short-7.ogg",
+          "mp3": "short/short-7.mp3",
+          "prompt": "A quick snappy fart, one short burst. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.0,
+          "requestedSeconds": 1.0,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "short/short-8.ogg",
+          "mp3": "short/short-8.mp3",
+          "prompt": "A short punchy fart with a little flutter at the end. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.0,
+          "requestedSeconds": 1.0,
+          "credits": 0
         }
       ]
     },
@@ -191,7 +218,34 @@
           "prompt": "A wobbly rubbery flutter, like a whoopee cushion with bubbles, bouncy and silly. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.36,
           "requestedSeconds": 1.4,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "bubbly/bubbly-6.ogg",
+          "mp3": "bubbly/bubbly-6.mp3",
+          "prompt": "A bubbly fluttering fart, wet-sounding wobble of many tiny bursts. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.36,
+          "requestedSeconds": 1.4,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "bubbly/bubbly-7.ogg",
+          "mp3": "bubbly/bubbly-7.mp3",
+          "prompt": "A wobbly rippling fart, a fast flutter like a motorboat, short and silly. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.36,
+          "requestedSeconds": 1.4,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "bubbly/bubbly-8.ogg",
+          "mp3": "bubbly/bubbly-8.mp3",
+          "prompt": "A bubbly fart in a bathtub, gurgling bubbles rising, funny. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.36,
+          "requestedSeconds": 1.4,
+          "credits": 58
         }
       ]
     },
@@ -336,7 +390,34 @@
           "prompt": "A silly short trombone 'bwap', one low comedic brass note. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.28,
           "requestedSeconds": 1.3,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "trumpet/trumpet-6.ogg",
+          "mp3": "trumpet/trumpet-6.mp3",
+          "prompt": "A loud trumpeting fart, a brassy honk like a horn, proud and comic. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.28,
+          "requestedSeconds": 1.3,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "trumpet/trumpet-7.ogg",
+          "mp3": "trumpet/trumpet-7.mp3",
+          "prompt": "A booming fart that sounds like a tuba blast, one big brassy note. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.28,
+          "requestedSeconds": 1.3,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "trumpet/trumpet-8.ogg",
+          "mp3": "trumpet/trumpet-8.mp3",
+          "prompt": "A fanfare-like fart, two quick honks and a long brassy note. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.28,
+          "requestedSeconds": 1.3,
+          "credits": 0
         }
       ]
     },
@@ -481,7 +562,34 @@
           "prompt": "A big low rubbery 'brrrp' from a giant whoopee cushion, deep and bouncy. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.",
           "durationSeconds": 1.6,
           "requestedSeconds": 1.6,
-          "credits": null
+          "credits": 0
+        },
+        {
+          "take": 6,
+          "file": "rumble/rumble-6.ogg",
+          "mp3": "rumble/rumble-6.mp3",
+          "prompt": "A deep low rumbling fart, powerful and bassy, short. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.6,
+          "requestedSeconds": 1.6,
+          "credits": 0
+        },
+        {
+          "take": 7,
+          "file": "rumble/rumble-7.ogg",
+          "mp3": "rumble/rumble-7.mp3",
+          "prompt": "A huge thunderous fart, low rumble with a rattle, comic and loud. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.6,
+          "requestedSeconds": 1.6,
+          "credits": 0
+        },
+        {
+          "take": 8,
+          "file": "rumble/rumble-8.ogg",
+          "mp3": "rumble/rumble-8.mp3",
+          "prompt": "A deep growling fart that rattles, very low pitch, about a second and a half. realistic comedic fart sound effect, close microphone, dry, no voice, no music, no laughter, no other sounds.",
+          "durationSeconds": 1.6,
+          "requestedSeconds": 1.6,
+          "credits": 0
         }
       ]
     },
@@ -588,5 +696,5 @@
     "subscriptionUsedAfter": 15331,
     "subscriptionLimit": 45926
   },
-  "creditsMeasured": 24
+  "creditsMeasured": 82
 }
