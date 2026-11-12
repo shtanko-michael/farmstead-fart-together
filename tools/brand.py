@@ -103,6 +103,26 @@ def frames(clip: str) -> list[Path]:
     raise SystemExit(f"no frames for {clip}")
 
 
+def place(fr: Image.Image, size: tuple[int, int]) -> Image.Image:
+    """The frame on a banner canvas with the players (frame centre-left, ~0.42 across) moved to ~0.68 across, clear
+    of the logo. The frame is scaled to 1.25x the banner height and fades from the left into a dark panel that
+    carries the logo."""
+    w, h = size
+    fh = int(h * 1.25)
+    fw = int(fr.width * fh / fr.height)
+    im = fr.resize((fw, fh), Image.LANCZOS)
+    x = int(0.68 * w - 0.42 * fw)
+    y = (h - fh) // 2
+    canvas = Image.new("RGBA", size, (16, 20, 14, 255))  # the logo's dark panel; the game fades into it
+    if x > 0:
+        ramp = Image.linear_gradient("L").rotate(90, expand=True).resize((fw // 4, fh))  # 0 -> 255 left to right
+        mask = Image.new("L", (fw, fh), 255)
+        mask.paste(ramp, (0, 0))
+        im.putalpha(mask)
+    canvas.alpha_composite(im, (x, y))
+    return canvas
+
+
 def banner(clips: list[str]) -> None:
     lg = logo()
     seq = []
@@ -114,20 +134,25 @@ def banner(clips: list[str]) -> None:
         fr = Image.open(f).convert("RGBA")
         for size, out in (((1280, 480), big), ((800, 300), small)):
             w, h = size
-            k = max(w / fr.width, h / fr.height)
-            im = fr.resize((int(fr.width * k), int(fr.height * k)), Image.LANCZOS)
-            im = im.crop(((im.width - w) // 2, (im.height - h) // 2, (im.width + w) // 2, (im.height + h) // 2))
+            im = place(fr, size)
             shade = Image.new("RGBA", size, (0, 0, 0, 0))
-            ImageDraw.Draw(shade).rectangle((0, 0, int(w * 0.55), h), fill=(10, 12, 8, 120))
+            ImageDraw.Draw(shade).rectangle((0, 0, int(w * 0.4), h), fill=(10, 12, 8, 90))
             im.alpha_composite(shade.filter(ImageFilter.GaussianBlur(40)))
-            s = (w * 0.5) / lg.width
+            s = (w * 0.44) / lg.width
             l2 = lg.resize((int(lg.width * s), int(lg.height * s)), Image.LANCZOS)
             im.alpha_composite(l2, (int(w * 0.03), (h - l2.height) // 2))
             out.append(im.convert("RGB"))
     big[0].save(MEDIA / "banner.webp", save_all=True, append_images=big[1:], duration=100, loop=0, quality=80)
-    # CurseForge: keep the GIF near 4 MB (every other frame at 5 fps, a smaller palette)
-    pal = [im.quantize(colors=96, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE) for im in small[::2]]
-    pal[0].save(MEDIA / "banner.gif", save_all=True, append_images=pal[1:], duration=200, loop=0, optimize=True)
+    # CurseForge: keep the GIF near 4 MB (every other frame at 5 fps). One palette for all frames, taken from a strip
+    # of frames across the clip: a palette per frame made the logo change colour from frame to frame.
+    gif = small[::2]
+    pick = gif[:: max(1, len(gif) // 8)][:8]
+    strip = Image.new("RGB", (pick[0].width, pick[0].height * len(pick)))
+    for i, im in enumerate(pick):
+        strip.paste(im, (0, i * im.height))
+    palette = strip.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    pal = [im.quantize(palette=palette, dither=Image.Dither.NONE) for im in gif]
+    pal[0].save(MEDIA / "banner.gif", save_all=True, append_images=pal[1:], duration=200, loop=0, optimize=False)
     for name in ("banner.webp", "banner.gif"):
         print(name, (MEDIA / name).stat().st_size // 1024, "KB")
 
