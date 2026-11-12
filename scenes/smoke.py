@@ -44,13 +44,28 @@ def run(ctx):
     ctx.cmd(f"tp {p} 0.5 {Y} 0.5 90 10")
     hook(ctx, "camera", "front")
     ctx.wait(1)
+    ctx.cmd(f"fart charge {p} full")
+    ctx.wait(1)
     hook(ctx, "toot")
     ctx.wait(0.4)
     ctx.shot("smoke-toot")
+    # M2: a crop row and the gas meter after a bowl of beans
+    ctx.cmds(f"fill -3 {Y - 1} 3 3 {Y - 1} 3 farmland",
+             *[f"setblock {i - 3} {Y} 3 farmstead_fart_together:{'bean' if i % 2 else 'cabbage'}_crop[age={min(7, i + 2)}]" for i in range(6)],
+             f"item replace entity {p} hotbar.0 with farmstead_fart_together:bowl_of_beans", f"tp {p} 0.5 {Y} 0.5 0 30")
+    ctx.wait(3)
+    hook(ctx, "camera", "first")
+    hook(ctx, "use", "45")
+    ctx.wait(3.5)
+    ctx.shot("smoke-crops-meter")
+    info = ctx.cmd("fart info") or ""
     hook(ctx, "camera", "first")
     hook(ctx, "config.open")
     ctx.wait(1.5)
     ctx.shot("smoke-settings")
+    hook(ctx, "mystyle.play")
+    ctx.wait(0.6)
+    ctx.shot("smoke-my-style")
 
     client, server = log(ctx, "client"), log(ctx, "server")
     started = re.compile(r"\[Farmstead\] Fart Together \S+ started \((\w+), Minecraft ([^)]+)\)")
@@ -61,6 +76,8 @@ def run(ctx):
         f"client config file {CFG}: {'present' if cfg.exists() else 'MISSING'}",
         f"client command /farttogether reload: {'ok' if 'Fart Together settings reloaded' in client else 'no chat line'}",
         f"handshake (server answered hello): {'yes' if 'server runs Fart Together protocol' in client else 'NO'}",
+        f"/fart info (console): {info.strip()[:200]}",
+        f"gas after the bowl of beans: {re.findall(r'test: charge (\d+/\d+)', client)[-1:] or 'NONE'}",
         f"toot played from the server's broadcast: {'yes' if re.search(r'test: toot by \w+ .* own=true', client) else 'NO'}",
     ]
     errors = [l.strip() for l in (client + server).splitlines()

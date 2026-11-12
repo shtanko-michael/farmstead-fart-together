@@ -63,7 +63,7 @@ public final class StylePreview extends AbstractWidget {
             float dir = (float) Math.toRadians(150 + rnd.nextFloat() * 70);
             puffs.add(new Puff(cx + (rnd.nextFloat() - 0.5f) * 8, hip + (rnd.nextFloat() - 0.5f) * 8,
                 (float) Math.cos(dir) * speed, (float) Math.sin(dir) * speed * 0.5f - 8,
-                (3f + rnd.nextFloat() * 3f) * Math.max(0.5f, s.size()), color(s, hue),
+                (4f + rnd.nextFloat() * 5f) * Math.max(0.5f, s.size()), color(s, hue),
                 now + (long) (rnd.nextFloat() * 350_000_000L), (long) ((1.2f + rnd.nextFloat() * 1.0f) * s.duration() * 1e9)));
         }
     }
@@ -95,30 +95,6 @@ public final class StylePreview extends AbstractWidget {
         Style s = ClientConfig.style();
         if (now - lastPuff > AUTO_PUFF_NANOS) puff(s, 1f);
 
-        // the cloud behind the model: squares that drift out, rise a little and fade
-        for (Iterator<Puff> it = puffs.iterator(); it.hasNext(); ) {
-            Puff p = it.next();
-            if (now < p.born()) continue;
-            float t = (now - p.born()) / (float) p.life();
-            if (t >= 1) {
-                it.remove();
-                continue;
-            }
-            float secs = (now - p.born()) / 1e9f;
-            float drag = 1 - Math.min(0.85f, secs * 0.9f);
-            float px = p.x() + p.vx() * secs * drag;
-            float py = p.y() + p.vy() * secs * drag - secs * 4;
-            float size = p.size() * (1 + t * 1.2f);
-            int alpha = (int) (200 * (1 - t) * (1 - t)) + 20;
-            int r = Math.max(1, Math.round(size));
-            int ix = Math.round(px), iy = Math.round(py);
-            if (ix - r < x0 || ix + r > x1 || iy - r < y0 || iy + r > y1) continue;
-            int c = (alpha << 24) | p.color();
-            // a rounded blob: a cross of two rectangles
-            g.fill(ix - r, iy - r / 2, ix + r, iy + r / 2 + 1, c);
-            g.fill(ix - r / 2, iy - r, ix + r / 2 + 1, iy + r, c);
-        }
-
         if (mc.player != null) {
             float secs = (now - start) / 1e9f;
             // three-quarters, swinging a little: the helper turns the body by atan(offset) * 20 degrees
@@ -140,6 +116,30 @@ public final class StylePreview extends AbstractWidget {
             *///?} else
             g.drawString(mc.font, hint, x0 + (width - w) / 2, y1 - 20, 0xFFB0B0B0);
         }
+        // the cloud, in front of the model so it reads at this size: squares that drift out, rise and fade
+        for (Iterator<Puff> it = puffs.iterator(); it.hasNext(); ) {
+            Puff p = it.next();
+            if (now < p.born()) continue;
+            float t = (now - p.born()) / (float) p.life();
+            if (t >= 1) {
+                it.remove();
+                continue;
+            }
+            float secs = (now - p.born()) / 1e9f;
+            float drag = 1 - Math.min(0.85f, secs * 0.9f);
+            float px = p.x() + p.vx() * secs * drag;
+            float py = p.y() + p.vy() * secs * drag - secs * 4;
+            float size = p.size() * (1 + t * 1.2f);
+            int alpha = (int) (170 * (1 - t) * (1 - t)) + 15;
+            int r = Math.max(1, Math.round(size));
+            int ix = Math.round(px), iy = Math.round(py);
+            if (ix - r < x0 || ix + r > x1 || iy - r < y0 || iy + r > y1) continue;
+            int c = (alpha << 24) | p.color();
+            // a rounded blob: a cross of two rectangles
+            g.fill(ix - r, iy - r / 2, ix + r, iy + r / 2 + 1, c);
+            g.fill(ix - r / 2, iy - r, ix + r / 2 + 1, iy + r, c);
+        }
+
     }
 
     @Override
