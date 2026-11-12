@@ -244,6 +244,14 @@ public class ConfigScreen extends Screen {
                 s -> d.set(Math.round((d.min + s * (d.max - d.min)) * 100) / 100.0),
                 () -> Component.literal(DoubleValue.fmt(d.value()))));
         }
+        if (v instanceof StringValue t) {
+            EditBox box = new EditBox(font, x, y, CONTROL_W, 20, name(v));
+            box.setMaxLength(t.maxLength());
+            box.setValue(t.get());
+            // a value that does not parse yet (half-typed colour) is shown red and not applied
+            box.setResponder(s -> box.setTextColor(t.set(s) == null ? 0xFFE0E0E0 : 0xFFFF6060));
+            return List.of(box);
+        }
         if (v instanceof StringListValue l) {
             boolean picker = l.picker() != null;
             EditBox box = new EditBox(font, x, y, picker ? CONTROL_W - 24 : CONTROL_W, 20, name(v));

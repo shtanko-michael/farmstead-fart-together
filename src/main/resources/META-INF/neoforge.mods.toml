@@ -12,7 +12,8 @@ authors = "Farmstead"
 displayURL = "${homepage}"
 description = '''Toot with style: animated poses, gas clouds and handcrafted sounds. Charge up on beans, scare mobs, jet-jump and pull off team combos with friends. Family-friendly by default.'''
 ${icon_key} = "assets/farmstead_fart_together/icon.png"
-# Scaffold: no registries or packets yet, so either side may lack it. Revisit when items and payloads land.
+# Either side may lack the mod: payloads are optional and a missing peer means "only for yourself" toots.
+# Revisit when items (registries) land in M2.
 displayTest = "IGNORE_ALL_VERSION"
 
 [[mixins]]

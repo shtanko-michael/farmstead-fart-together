@@ -93,6 +93,10 @@ public final class ConfigFile {
         return add(new EnumValue<>(this, section, key, def));
     }
 
+    public StringValue text(String section, String key, String def, int maxLength, java.util.function.Function<String, String> check) {
+        return add(new StringValue(this, section, key, def, maxLength, check));
+    }
+
     public StringListValue list(String section, String key, List<String> def) {
         return add(new StringListValue(this, section, key, def));
     }

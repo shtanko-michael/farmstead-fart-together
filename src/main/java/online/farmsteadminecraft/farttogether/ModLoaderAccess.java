@@ -19,6 +19,12 @@ public interface ModLoaderAccess {
 
     String loaderName();
 
+    /**
+     * The player's permission node (LuckPerms or another permission mod of the loader); without one, the node's
+     * default. NeoForge/Forge use their PermissionAPI, Fabric the fabric-permissions-api if a mod provides it.
+     */
+    boolean permission(net.minecraft.server.level.ServerPlayer player, online.farmsteadminecraft.farttogether.server.Perm perm);
+
     /** The game's config folder ({@code .minecraft/config}). */
     java.nio.file.Path configDir();
 

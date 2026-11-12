@@ -25,6 +25,11 @@ public final class TestHooks {
     private TestHooks() {
     }
 
+    /** Test-only logging (what was heard and seen) is written when the hooks are on. */
+    public static boolean enabled() {
+        return ENABLED;
+    }
+
     public static void tick(Minecraft mc) {
         // on with -Dfarmstead.testhooks=true, or when a <gameDir>/testhooks folder exists (capture rigs
         // whose launch arguments we do not control)
@@ -73,11 +78,23 @@ public final class TestHooks {
                         case "front" -> net.minecraft.client.CameraType.THIRD_PERSON_FRONT;
                         default -> net.minecraft.client.CameraType.FIRST_PERSON;
                     });
-                } else if (file.equals("puff.player")) {
-                    // a puff behind another player (by name), to check what others see
-                    String who = Files.readString(req).trim();
+                } else if (file.equals("toot")) {
+                    // presses the toot key once (the same path as the real key)
                     Files.deleteIfExists(req);
-                    if (mc.level != null) for (var pl : mc.level.players()) if (pl.getName().getString().equals(who)) FartTogetherClient.puff(mc, pl);
+                    ClientNet.tootPressed(mc);
+                } else if (file.equals("chat")) {
+                    // sends a chat line (players tell each other in the two-client scene who did what)
+                    String text = Files.readString(req).trim();
+                    Files.deleteIfExists(req);
+                    if (mc.player != null) mc.player.connection.sendChat(text);
+                } else if (file.equals("look")) {
+                    // "<yaw> <pitch>": turn the local player (a two-client scene points each camera at the other)
+                    String[] arg = Files.readString(req).trim().split(" ");
+                    Files.deleteIfExists(req);
+                    if (mc.player != null) {
+                        mc.player.setYRot(Float.parseFloat(arg[0]));
+                        mc.player.setXRot(arg.length > 1 ? Float.parseFloat(arg[1]) : 0f);
+                    }
                 } else if (file.equals("command.run")) {
                     // types a command as a player would (exercises the client command path of each loader)
                     String command = Files.readString(req).trim();

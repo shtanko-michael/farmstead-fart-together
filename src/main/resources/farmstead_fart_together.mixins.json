@@ -3,7 +3,9 @@
   "package": "online.farmsteadminecraft.farttogether.mixin",
   "compatibilityLevel": "${java}",
   "mixins": [
-
+  ],
+  "client": [
+    "HumanoidModelMixin"${extraClient}
   ],
   "injectors": {
     "defaultRequire": 1

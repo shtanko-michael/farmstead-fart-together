@@ -4,8 +4,6 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.entity.player.Player;
 import online.farmsteadminecraft.farttogether.FartTogether;
 import online.farmsteadminecraft.farttogether.brand.FarmsteadBrand;
 import online.farmsteadminecraft.farttogether.config.ConfigScreen;
@@ -36,27 +34,13 @@ public final class FartTogetherClient {
     }
 
     /**
-     * "Try it" in the settings: a local puff behind you with the current particle setting. Scaffold stand-in until
-     * the real toot (pose, own particles and sounds) exists; nothing is sent to the server.
+     * "Try it" in the settings: your current style, unsaved, played locally for you only (nothing is sent; others
+     * see the saved style after "Done").
      */
     public static void tryIt() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
-        puff(mc, mc.player);
-    }
-
-    /** A cloud of vanilla sneeze particles (the panda's green puff) behind a player's hips. */
-    public static void puff(Minecraft mc, Player player) {
-        int count = (int) Math.round(24 * ClientConfig.PARTICLES.value());
-        double yaw = Math.toRadians(player.getYRot());
-        double bx = Math.sin(yaw) * 0.35, bz = -Math.cos(yaw) * 0.35;
-        java.util.Random rnd = new java.util.Random();
-        for (int i = 0; i < count; i++) {
-            mc.level.addParticle(ParticleTypes.SNEEZE,
-                player.getX() + bx + (rnd.nextDouble() - 0.5) * 0.3, player.getY() + 0.75 + (rnd.nextDouble() - 0.5) * 0.2,
-                player.getZ() + bz + (rnd.nextDouble() - 0.5) * 0.3,
-                bx * 0.15 + (rnd.nextDouble() - 0.5) * 0.03, 0.01, bz * 0.15 + (rnd.nextDouble() - 0.5) * 0.03);
-        }
+        Toots.play(mc, mc.player, ClientConfig.style(), new java.util.Random().nextLong(), true);
     }
 
     /** {@code /farttogether config}: the chat screen closes after the command, so open on the next tick. */
@@ -65,6 +49,9 @@ public final class FartTogetherClient {
     }
 
     public static void tick(Minecraft mc) {
+        ClientNet.tick(mc);
+        Keys.tick(mc);
+        Toots.tick(mc);
         TestHooks.tick(mc);
         Recorder.tick(mc);
         if (openConfig) {

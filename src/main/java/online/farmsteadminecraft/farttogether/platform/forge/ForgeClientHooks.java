@@ -9,12 +9,13 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import online.farmsteadminecraft.farttogether.client.FartTogetherClient;
 import online.farmsteadminecraft.farttogether.client.FartTogetherCommands;
+import online.farmsteadminecraft.farttogether.client.Keys;
 
 final class ForgeClientHooks {
     private ForgeClientHooks() {
     }
 
-    static void register() {
+    static void register(net.minecraftforge.eventbus.api.IEventBus modBus) {
         FartTogetherClient.init();
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
             () -> new ConfigScreenHandler.ConfigScreenFactory((mc, parent) -> FartTogetherClient.configScreen(parent)));
@@ -23,5 +24,6 @@ final class ForgeClientHooks {
         MinecraftForge.EVENT_BUS.addListener((TickEvent.ClientTickEvent event) -> {
             if (event.phase == TickEvent.Phase.END) FartTogetherClient.tick(Minecraft.getInstance());
         });
+        modBus.addListener((net.minecraftforge.client.event.RegisterKeyMappingsEvent event) -> event.register(Keys.TOOT));
     }
 }

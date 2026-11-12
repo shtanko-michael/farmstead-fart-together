@@ -102,7 +102,10 @@ tasks {
         filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
 
         val mixinJava = "JAVA_${requiredJava.majorVersion}"
-        filesMatching("*.mixins.json") { expand("java" to mixinJava, "extraClient" to "") }
+        // mixins that only exist for some versions: `, "NameMixin"` entries appended to the client list
+        val extraClient = if (sc.current.parsed >= "1.21.2") ", \"LivingEntityRendererMixin\", \"LivingEntityRenderStateMixin\"" else ""
+        inputs.property("extraClient", extraClient)
+        filesMatching("*.mixins.json") { expand("java" to mixinJava, "extraClient" to extraClient) }
 
         exclude("fabric.mod.json", "*.ct", "*.classtweaker", "META-INF/mods.toml", "pack.mcmeta")
     }
