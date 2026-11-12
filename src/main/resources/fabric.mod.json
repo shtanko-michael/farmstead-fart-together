@@ -19,12 +19,12 @@
     "modmenu": ["online.farmsteadminecraft.farttogether.platform.fabric.FartTogetherModMenu"]
   },
   "mixins": [
-    "farmstead_fart_together.mixins.json",
-    {"config": "farmstead_fart_together.fabric.mixins.json", "environment": "client"}
+    "farmstead_fart_together.mixins.json"
   ],
   "accessWidener": "farmstead_fart_together.ct",
   "depends": {
     "fabricloader": ">=${loader}",
+    "fabric-api": ">=${fabric_api}",
     "minecraft": "${minecraft}"
   },
   "suggests": {

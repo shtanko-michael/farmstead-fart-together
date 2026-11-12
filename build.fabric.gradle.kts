@@ -37,6 +37,7 @@ dependencies {
      * Fetches only the required Fabric API modules to not waste time downloading all of them for each version.
      * @see <a href="https://github.com/FabricMC/fabric">List of Fabric API modules</a>
      */
+    @Suppress("unused")
     fun fapi(vararg modules: String) {
         for (it in modules) modImplementation(fabricApi.module(it, sc.properties["deps.fabric_api"]))
     }
@@ -47,7 +48,10 @@ dependencies {
 
     // Use `mod{dependency type}` even on 26.1+ - loom-back-compat converts them
     modImplementation("net.fabricmc:fabric-loader:${sc.properties["deps.fabric_loader"]}")
-    // No Fabric API: the mod hooks in through its own mixins (platform/fabric/mixin), so players need nothing else
+    // Fabric API is required on Fabric (owner's decision 2026-11-12, PLAN.md "Networking and dependencies"):
+    // networking, key binding, client commands and the mod's own resources (sounds, lang). The whole API is
+    // used for compiling and the dev runtime; players install it from Modrinth like for most Fabric mods.
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${sc.properties["deps.fabric_api"]}")
     // Mod Menu is optional at runtime: only its API is compiled against, for the settings button
     modCompileOnly("maven.modrinth:modmenu:${sc.properties["deps.modmenu"]}")
 }
@@ -117,6 +121,7 @@ tasks {
             register("issues", sc.properties["mod.issues"])
             register("version", sc.properties["mod.version"])
             register("minecraft", sc.properties["mod.mc_compat"])
+            register("fabric_api", sc.properties["deps.fabric_api"].substringBefore("+"))
             register("loader", Regex("\\d+\\.\\d+").find(sc.properties["deps.fabric_loader"])!!.value)
         }
 
@@ -124,7 +129,7 @@ tasks {
 
         val mixinJava = "JAVA_${requiredJava.majorVersion}"
         // mixins that only exist for some versions: `, "NameMixin"` entries appended to the client list
-        val extraClient = ""
+        val extraClient = if (sc.current.parsed >= "1.21.2") ", \"LivingEntityRendererMixin\", \"LivingEntityRenderStateMixin\"" else ""
         inputs.property("extraClient", extraClient)
         filesMatching("*.mixins.json") { expand("java" to mixinJava, "extraClient" to extraClient) }
 

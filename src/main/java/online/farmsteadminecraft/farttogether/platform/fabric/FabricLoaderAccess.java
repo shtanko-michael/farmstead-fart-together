@@ -27,6 +27,31 @@ final class FabricLoaderAccess implements ModLoaderAccess {
         return loader.getConfigDir();
     }
 
+    /**
+     * fabric-permissions-api (bundled by LuckPerms and most permission mods) if one is installed, found by reflection
+     * so the mod does not need it; otherwise the node's default.
+     */
+    @Override
+    public boolean permission(net.minecraft.server.level.ServerPlayer player, online.farmsteadminecraft.farttogether.server.Perm perm) {
+        if (CHECK == null) return perm.def;
+        try {
+            return (Boolean) CHECK.invoke(null, player, perm.node(), perm.def);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return perm.def;
+        }
+    }
+
+    private static final java.lang.reflect.Method CHECK = findCheck();
+
+    private static java.lang.reflect.Method findCheck() {
+        try {
+            Class<?> c = Class.forName("me.lucko.fabric.api.permissions.v0.Permissions");
+            return c.getMethod("check", net.minecraft.world.entity.Entity.class, String.class, boolean.class);
+        } catch (ReflectiveOperationException | LinkageError e) {
+            return null;
+        }
+    }
+
     @Override
     public String loaderName() {
         return "fabric";
