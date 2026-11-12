@@ -1,0 +1,149 @@
+<title>Fart Together Sounds</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a mixing-desk sheet: one row per sound slot, five take pads, the chosen pad lit. */
+:root {
+  --bg: #f4f6f1; --panel: #ffffff; --ink: #1c2420; --muted: #5d6b63; --rule: #dde3dc;
+  --accent: #3f8f3a; --accent-ink: #ffffff; --accent-soft: #e2f0dd; --warm: #b8762b;
+  --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121714; --panel: #1a211d; --ink: #e3ebe5; --muted: #95a59b; --rule: #2a352f;
+  --accent: #7ccc6c; --accent-ink: #0f1a10; --accent-soft: #1f3320; --warm: #e0a25a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121714; --panel: #1a211d; --ink: #e3ebe5; --muted: #95a59b; --rule: #2a352f;
+  --accent: #7ccc6c; --accent-ink: #0f1a10; --accent-soft: #1f3320; --warm: #e0a25a; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 32px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 5vw, 40px); letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 62ch; line-height: 1.5; margin: 10px 0 0; }
+.status { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 14px; }
+.pill { font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.pill.warn { background: transparent; color: var(--warm); border: 1px solid var(--warm); }
+.slots { display: grid; gap: 14px; margin-top: 26px; }
+.slot { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 20px; align-items: center; }
+.slot h2 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 0; display: flex; gap: 10px; align-items: baseline; }
+.slot h2 small { font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+.purpose { color: var(--muted); margin: 4px 0 0; font-size: 14px; line-height: 1.4; }
+.takes { display: flex; flex-wrap: wrap; gap: 8px; }
+.take { display: grid; grid-template-rows: auto auto; gap: 4px; justify-items: center; }
+.pad { width: 54px; height: 54px; border-radius: 10px; border: 1px solid var(--rule); background: var(--bg); color: var(--ink);
+  font: 600 16px var(--display); cursor: pointer; position: relative; transition: transform .08s, background .15s; }
+.pad:hover { border-color: var(--accent); }
+.pad:active { transform: scale(.96); }
+.pad:focus-visible, .pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pad.playing { background: var(--accent-soft); border-color: var(--accent); }
+.pad.chosen { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pick { font: 500 12px var(--body); color: var(--muted); background: none; border: 0; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+.pick:hover { color: var(--accent); }
+.pick[aria-pressed="true"] { color: var(--accent); font-weight: 600; }
+.prompt { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); font-family: var(--mono); line-height: 1.45; min-height: 1.45em; overflow-wrap: anywhere; }
+.foot { margin-top: 24px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+@media (max-width: 640px) { .slot { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .pad { transition: none; } }
+</style>
+
+<div class="wrap">
+  <h1>Fart Together sounds</h1>
+  <p class="lede">Eight sounds for the mod, five takes each. Press a pad to listen, then press <b>choose</b> under the take you want. Your choice is saved here and goes straight into the mod; you can change it any time.</p>
+  <div class="status"><span class="pill" id="count">0 of 8 chosen</span><span class="pill warn" id="save" hidden></span></div>
+  <div class="slots" id="slots"></div>
+  <p class="foot">Made with ElevenLabs sound effects. "Puff" replaces every sound when a player turns on the streamer-safe option.</p>
+</div>
+
+<script>
+const SLOTS = [
+  ["short", "Short", "The everyday toot: quick, light, the one heard most often."],
+  ["squeaky", "Squeaky", "High squeak: the funny, harmless one."],
+  ["bubbly", "Bubbly", "Fluttering, wobbly toot; also the base for the underwater variant later."],
+  ["long", "Long", "The long, drawn-out one for a big charge."],
+  ["trumpet", "Trumpet", "Brassy cartoon blat, a comic fanfare."],
+  ["tiny", "Tiny", "A tiny, cute peep for a small charge."],
+  ["rumble", "Rumble", "Deep, low and powerful: the big one."],
+  ["puff", "Puff", "Streamer-safe replacement for every sound: a soft air puff, nothing rude."],
+];
+const PROMPTS = {"short": ["A short quick whoopee cushion toot, a single rubbery 'pfft'. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A short quick whoopee cushion toot, a single rubbery 'pfft'. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A short quick whoopee cushion toot, a single rubbery 'pfft'. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A short quick whoopee cushion toot, a single rubbery 'pfft'. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A quick little rubbery whoopee cushion 'prrt', snappy and light. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."], "squeaky": ["A high-pitched squeaky whoopee cushion squeak, like a balloon neck being stretched. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A high-pitched squeaky whoopee cushion squeak, like a balloon neck being stretched. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A high-pitched squeaky whoopee cushion squeak, like a balloon neck being stretched. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A high-pitched squeaky whoopee cushion squeak, like a balloon neck being stretched. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A thin squeaky toot from a rubber balloon, rising in pitch at the end. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."], "bubbly": ["A bubbly fluttering whoopee cushion toot, rubbery and wobbly. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A bubbly fluttering whoopee cushion toot, rubbery and wobbly. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A bubbly fluttering whoopee cushion toot, rubbery and wobbly. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A bubbly fluttering whoopee cushion toot, rubbery and wobbly. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A wobbly rubbery flutter, like a whoopee cushion with bubbles, bouncy and silly. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."], "long": ["A long whoopee cushion slowly deflating, the pitch wobbling up and down, ending in a little squeak. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A long whoopee cushion slowly deflating, the pitch wobbling up and down, ending in a little squeak. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A long whoopee cushion slowly deflating, the pitch wobbling up and down, ending in a little squeak. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A long whoopee cushion slowly deflating, the pitch wobbling up and down, ending in a little squeak. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A long slow balloon deflating with a wavering rubbery tone, ending with a tiny squeak. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."], "trumpet": ["A single comedic low brass blat on a tuba, short and silly, like a cartoon toot. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A single comedic low brass blat on a tuba, short and silly, like a cartoon toot. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A single comedic low brass blat on a tuba, short and silly, like a cartoon toot. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A single comedic low brass blat on a tuba, short and silly, like a cartoon toot. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A silly short trombone 'bwap', one low comedic brass note. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."], "tiny": ["A tiny cute squeak of air from a small rubber toy, very short and quiet. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A tiny cute squeak of air from a small rubber toy, very short and quiet. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A tiny cute squeak of air from a small rubber toy, very short and quiet. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A tiny cute squeak of air from a small rubber toy, very short and quiet. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A very small soft peep of air from a squeezed rubber duck, cute and quiet. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."], "rumble": ["A deep low rubbery rumble from a big whoopee cushion, short and comedic. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A deep low rubbery rumble from a big whoopee cushion, short and comedic. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A deep low rubbery rumble from a big whoopee cushion, short and comedic. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A deep low rubbery rumble from a big whoopee cushion, short and comedic. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A big low rubbery 'brrrp' from a giant whoopee cushion, deep and bouncy. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."], "puff": ["A soft gentle puff of air, a small whoosh like blowing out a candle, nothing rude. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A soft gentle puff of air, a small whoosh like blowing out a candle, nothing rude. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A soft gentle puff of air, a small whoosh like blowing out a candle, nothing rude. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A soft gentle puff of air, a small whoosh like blowing out a candle, nothing rude. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter.", "A soft short whoosh of air from a small bellows, gentle and clean. cartoon sound effect, comedic and family-friendly, clean studio recording, no voice, no music, no laughter."]};
+const picks = {};
+let db = null, audio = null, playingPad = null;
+
+function render() {
+  const host = document.getElementById("slots");
+  host.textContent = "";
+  for (const [id, name, purpose] of SLOTS) {
+    const card = document.createElement("section");
+    card.className = "slot";
+    const head = document.createElement("div");
+    const h = document.createElement("h2");
+    h.textContent = name;
+    const sm = document.createElement("small");
+    sm.textContent = picks[id] ? "take " + picks[id] + " chosen" : "not chosen";
+    h.append(sm);
+    const p = document.createElement("p");
+    p.className = "purpose"; p.textContent = purpose;
+    head.append(h, p);
+    const takes = document.createElement("div");
+    takes.className = "takes";
+    const prompt = document.createElement("div");
+    prompt.className = "prompt";
+    for (let n = 1; n <= 5; n++) {
+      const t = document.createElement("div"); t.className = "take";
+      const pad = document.createElement("button");
+      pad.className = "pad" + (picks[id] === n ? " chosen" : "");
+      pad.id = "pad-" + id + "-" + n;
+      pad.textContent = n;
+      pad.setAttribute("aria-label", name + ", take " + n + ": play");
+      pad.onclick = () => { play(id, n, pad); prompt.textContent = (PROMPTS[id] || [])[n - 1] || ""; };
+      const pick = document.createElement("button");
+      pick.className = "pick"; pick.id = "pick-" + id + "-" + n;
+      pick.textContent = picks[id] === n ? "chosen" : "choose";
+      pick.setAttribute("aria-pressed", picks[id] === n ? "true" : "false");
+      pick.onclick = () => choose(id, n);
+      t.append(pad, pick);
+      takes.append(t);
+    }
+    card.append(head, takes, prompt);
+    host.append(card);
+  }
+  document.getElementById("count").textContent = Object.keys(picks).length + " of 8 chosen";
+}
+
+function play(id, n, pad) {
+  try { if (audio) audio.pause(); } catch (e) {}
+  if (playingPad) playingPad.classList.remove("playing");
+  audio = new Audio("sounds/" + id + "/" + id + "-" + n + ".mp3");
+  playingPad = pad; pad.classList.add("playing");
+  audio.onended = () => pad.classList.remove("playing");
+  audio.play().catch(() => pad.classList.remove("playing"));
+}
+
+async function choose(id, n) {
+  picks[id] = n;
+  render();
+  const save = document.getElementById("save");
+  if (!db) { save.hidden = false; save.textContent = "not saved: sign in to claude.ai to save"; return; }
+  try {
+    await db.doc("picks/" + id).set({ take: n, at: new Date().toISOString() });
+    save.hidden = true;
+  } catch (e) {
+    save.hidden = false; save.textContent = "could not save: " + (e && e.code || "error");
+  }
+}
+
+render();
+(async () => {
+  db = await window.claude?.use?.("db") ?? null;
+  if (!db) return;
+  const timer = setTimeout(() => {}, 10000);
+  db.collection("picks").onSnapshot(snap => {
+    clearTimeout(timer);
+    for (const d of snap.docs) { const v = d.data(); if (v && v.take) picks[d.id] = v.take; }
+    render();
+  }, () => clearTimeout(timer));
+})();
+</script>
