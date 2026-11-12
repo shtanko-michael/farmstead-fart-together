@@ -130,7 +130,10 @@ public final class GasClouds {
                 if (!ServerConfig.CLOUD_PLAYERS.on() || TootServer.allowed(target, Perm.CLOUD_BYPASS)) continue;
                 if (ServerConfig.RESPECT_PVP.on() && owner != null && !owner.canHarmPlayer(target)) continue;
             }
-            for (MobEffectInstance fx : effects) e.addEffect(new MobEffectInstance(fx));
+            // no swirling effect particles around the player: the gas cloud itself is the visual
+            for (MobEffectInstance fx : effects) {
+                e.addEffect(new MobEffectInstance(fx.getEffect(), fx.getDuration(), fx.getAmplifier(), false, false, true));
+            }
         }
     }
 

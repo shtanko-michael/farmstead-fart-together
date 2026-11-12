@@ -52,11 +52,15 @@ neoForge {
             providers.gradleProperty("clientSize").orNull?.split("x")?.let { programArguments.addAll("--width", it[0], "--height", it[1]) }
             // `-PtestHooks` lets the test runner request screenshots through files (see TestHooks)
             if (providers.gradleProperty("testHooks").isPresent) jvmArguments.add("-Dfarmstead.testhooks=true")
+            // `-PclientXmx=1500m` caps a client's heap (many clients at once, tools/crowd.py)
+            providers.gradleProperty("clientXmx").orNull?.let { jvmArguments.add("-Xmx$it") }
         }
 
         register("server") {
             gameDirectory = rootProject.file("run/${sc.current.project}/server")
             server()
+            // `-PtestHooks` on the server enables the test-only `/fart testcombo` (stand-in combo participants)
+            if (providers.gradleProperty("testHooks").isPresent) jvmArguments.add("-Dfarmstead.testhooks=true")
             programArguments.add("--nogui") // the Swing console window crashes under heavy RCON/log traffic
         }
     }

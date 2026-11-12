@@ -18,7 +18,8 @@ import net.minecraft.world.phys.Vec3;
  * the advancements for 2, 4 and 8. Server thread only.
  */
 public final class Together {
-    private record Toot(UUID who, ServerLevel level, Vec3 pos, long at) {}
+    /** {@code fake}: a stand-in participant from {@code /fart testcombo} (test rig only, see {@link #injectFake}). */
+    private record Toot(UUID who, ServerLevel level, Vec3 pos, long at, boolean fake) {}
 
     private static final List<Toot> RECENT = new ArrayList<>();
 
@@ -33,18 +34,24 @@ public final class Together {
         long window = (long) (ServerConfig.TOGETHER_WINDOW.value() * 1000);
         RECENT.removeIf(t -> nowMillis - t.at() > window);
         RECENT.removeIf(t -> t.who().equals(player.getUUID()));
-        RECENT.add(new Toot(player.getUUID(), level, pos, nowMillis));
+        RECENT.add(new Toot(player.getUUID(), level, pos, nowMillis, false));
         double r = ServerConfig.TOGETHER_RADIUS.value();
         Map<UUID, ServerPlayer> members = new LinkedHashMap<>();
+        int fakes = 0;
         Vec3 sum = Vec3.ZERO;
         for (Toot t : RECENT) {
             if (t.level() != level || t.pos().distanceToSqr(pos) > r * r) continue;
+            if (t.fake()) {
+                fakes++;
+                sum = sum.add(t.pos());
+                continue;
+            }
             ServerPlayer p = level.getServer().getPlayerList().getPlayer(t.who());
             if (p == null || !p.isAlive() || !TootServer.allowed(p, Perm.TOGETHER)) continue;
             members.put(t.who(), p);
             sum = sum.add(t.pos());
         }
-        int n = members.size();
+        int n = members.size() + fakes;
         if (n < 2) return new Combo(1, List.of(player), pos);
         return new Combo(n, new ArrayList<>(members.values()), sum.scale(1.0 / n));
     }
@@ -65,6 +72,18 @@ public final class Together {
             Awards.TOGETHER_2.grant(p);
             if (combo.count() >= 4) Awards.TOGETHER_4.grant(p);
             if (combo.count() >= 8) Awards.TOGETHER_8.grant(p);
+        }
+    }
+
+    /**
+     * Test rig only ({@code /fart testcombo}, registered with {@code -Dfarmstead.testhooks=true}): {@code count}
+     * stand-in participants "toot" now in a ring around {@code centre}, so the next real toot there makes a combo of
+     * real + stand-in players. Stand-ins count towards N but get no messages, glow or advancements.
+     */
+    public static void injectFake(ServerLevel level, Vec3 centre, int count, long nowMillis) {
+        for (int i = 0; i < count; i++) {
+            double a = Math.PI * 2 * i / Math.max(1, count);
+            RECENT.add(new Toot(UUID.randomUUID(), level, centre.add(Math.cos(a) * 2, 0, Math.sin(a) * 2), nowMillis, true));
         }
     }
 

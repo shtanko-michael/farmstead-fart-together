@@ -77,6 +77,10 @@ loom {
     }
 
     // `-PquickPlay=localhost:25600` joins a server straight away, `-PmcUser=Name` picks the offline name
+    // `-PtestHooks` on the server enables the test-only `/fart testcombo` (stand-in combo participants)
+    runConfigs.named("server") {
+        if (providers.gradleProperty("testHooks").isPresent) vmArg("-Dfarmstead.testhooks=true")
+    }
     runConfigs.named("client") {
         providers.gradleProperty("quickPlay").orNull?.let { programArgs("--quickPlayMultiplayer", it) }
             providers.gradleProperty("mcUser").orNull?.let { programArgs("--username", it) }
@@ -84,6 +88,8 @@ loom {
         providers.gradleProperty("clientSize").orNull?.split("x")?.let { programArgs("--width", it[0], "--height", it[1]) }
         // `-PtestHooks` lets the test runner request screenshots through files (see TestHooks)
         if (providers.gradleProperty("testHooks").isPresent) vmArg("-Dfarmstead.testhooks=true")
+        // `-PclientXmx=1500m` caps a client's heap (many clients at once, tools/crowd.py)
+        providers.gradleProperty("clientXmx").orNull?.let { vmArg("-Xmx$it") }
         // `-PclientDir=client2` runs a second client next to the first (two-player tests, tools/duo.py)
         providers.gradleProperty("clientDir").orNull?.let { runDirectory = rootProject.file("run/${sc.current.project}/$it") }
     }

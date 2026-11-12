@@ -209,8 +209,18 @@ public final class ClientNet {
                 new net.minecraft.world.phys.Vec3(toot.x(), toot.y(), toot.z()), toot.radius(), toot.lingerTicks(), toot.flags());
         } else if (msg instanceof Proto.ComboS2C combo) {
             if (mc.level == null || mc.player == null) return;
+            // the shared cloud takes a blend of the members' colours (as this screen shows their styles)
+            int r = 0, g = 0, b = 0, n = 0;
+            for (UUID m : combo.members()) {
+                int rgb = styleFor(mc, m, m.equals(mc.player.getUUID())).color();
+                r += (rgb >> 16) & 255;
+                g += (rgb >> 8) & 255;
+                b += rgb & 255;
+                n++;
+            }
+            int blend = n == 0 ? Style.DEFAULT_COLOR : ((r / n) << 16) | ((g / n) << 8) | (b / n);
             Toots.combo(mc, combo.count(), combo.seed(), new net.minecraft.world.phys.Vec3(combo.x(), combo.y(), combo.z()),
-                combo.radius(), combo.lingerTicks());
+                combo.radius(), combo.lingerTicks(), blend);
         }
     }
 

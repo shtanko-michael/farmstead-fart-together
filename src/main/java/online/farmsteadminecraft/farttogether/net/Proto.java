@@ -61,10 +61,13 @@ public final class Proto {
 
     /**
      * Fart Together: {@code count} players tooted together near {@code x y z}; every receiver plays the chorus and
-     * draws the big shared cloud ({@code radius}, {@code lingerTicks}) from the same {@code seed}.
+     * draws the big shared cloud ({@code radius}, {@code lingerTicks}) from the same {@code seed}, tinted with a blend
+     * of the {@code members}' colours (at most {@link #MAX_MEMBERS} of them are sent).
      */
-    public record ComboS2C(int count, long seed, float x, float y, float z, float radius, int lingerTicks)
-        implements ToClient {}
+    public record ComboS2C(int count, long seed, float x, float y, float z, float radius, int lingerTicks,
+                           java.util.List<UUID> members) implements ToClient {}
+
+    public static final int MAX_MEMBERS = 8;
 
     /** This player's gas: {@code charge} of {@code max}; a toot needs {@code min} (0 when gas is not required). */
     public record ChargeS2C(int charge, int max, int min, boolean enabled) implements ToClient {}
@@ -116,6 +119,9 @@ public final class Proto {
             buf.writeFloat(m.z());
             buf.writeFloat(m.radius());
             buf.writeVarInt(m.lingerTicks());
+            int n = Math.min(MAX_MEMBERS, m.members().size());
+            buf.writeVarInt(n);
+            for (int i = 0; i < n; i++) buf.writeUUID(m.members().get(i));
         } else if (msg instanceof ChargeS2C m) {
             buf.writeByte(CHARGE);
             buf.writeVarInt(m.charge());
@@ -154,8 +160,7 @@ public final class Proto {
                 case HELLO -> new HelloS2C(buf.readVarInt(), buf.readVarInt(), buf.readVarInt());
                 case TOOT -> new TootS2C(buf.readUUID(), buf.readVarInt(), buf.readLong(), buf.readFloat(), buf.readFloat(),
                     buf.readFloat(), buf.readFloat(), buf.readVarInt(), buf.readVarInt());
-                case COMBO -> new ComboS2C(buf.readVarInt(), buf.readLong(), buf.readFloat(), buf.readFloat(), buf.readFloat(),
-                    buf.readFloat(), buf.readVarInt());
+                case COMBO -> readCombo(buf);
                 case STYLE -> new StyleS2C(buf.readUUID(), Style.read(buf));
                 case CHARGE -> new ChargeS2C(buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean());
                 default -> null;
@@ -163,6 +168,17 @@ public final class Proto {
         } catch (RuntimeException e) {
             return null;
         }
+    }
+
+    private static ComboS2C readCombo(FriendlyByteBuf buf) {
+        int count = buf.readVarInt();
+        long seed = buf.readLong();
+        float x = buf.readFloat(), y = buf.readFloat(), z = buf.readFloat(), radius = buf.readFloat();
+        int linger = buf.readVarInt();
+        int n = Math.min(MAX_MEMBERS, buf.readVarInt());
+        java.util.List<UUID> members = new java.util.ArrayList<>();
+        for (int i = 0; i < n; i++) members.add(buf.readUUID());
+        return new ComboS2C(count, seed, x, y, z, radius, linger, members);
     }
 
     private static byte[] bytes(FriendlyByteBuf buf) {

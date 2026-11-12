@@ -20,6 +20,7 @@ import online.farmsteadminecraft.farttogether.content.Content;
  */
 public final class FartCommands {
     private static final String K = "command.farmstead_fart_together.";
+    private static final boolean TEST = Boolean.getBoolean("farmstead.testhooks");
 
     private FartCommands() {
     }
@@ -34,7 +35,18 @@ public final class FartCommands {
                     .then(Commands.argument("amount", IntegerArgumentType.integer(0, 10000))
                         .executes(c -> charge(c, IntegerArgumentType.getInteger(c, "amount"))))))
             .then(Commands.literal("toggle").requires(s -> can(s, Perm.COMMAND_TOGGLE))
-                .then(Commands.argument("targets", EntityArgument.players()).executes(FartCommands::toggle)));
+                .then(Commands.argument("targets", EntityArgument.players()).executes(FartCommands::toggle)))
+            // test rig only (-Dfarmstead.testhooks=true): stand-in participants for a big Fart Together combo
+            .then(Commands.literal("testcombo").requires(s -> TEST && can(s, Perm.COMMAND_CHARGE))
+                .then(Commands.argument("target", EntityArgument.player())
+                    .then(Commands.argument("extra", IntegerArgumentType.integer(1, 16)).executes(c -> {
+                        ServerPlayer target = EntityArgument.getPlayer(c, "target");
+                        int extra = IntegerArgumentType.getInteger(c, "extra");
+                        TootServer.injectFakeToots(target, extra);
+                        c.getSource().sendSuccess(() -> Component.literal("test: " + extra + " stand-in toots around "
+                            + target.getName().getString() + " (toot within the combo window)"), false);
+                        return extra;
+                    }))));
     }
 
     private static boolean can(CommandSourceStack source, Perm perm) {

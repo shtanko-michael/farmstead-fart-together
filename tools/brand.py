@@ -125,8 +125,9 @@ def banner(clips: list[str]) -> None:
             im.alpha_composite(l2, (int(w * 0.03), (h - l2.height) // 2))
             out.append(im.convert("RGB"))
     big[0].save(MEDIA / "banner.webp", save_all=True, append_images=big[1:], duration=100, loop=0, quality=80)
-    pal = [im.quantize(colors=200, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE) for im in small]
-    pal[0].save(MEDIA / "banner.gif", save_all=True, append_images=pal[1:], duration=100, loop=0, optimize=True)
+    # CurseForge: keep the GIF near 4 MB (every other frame at 5 fps, a smaller palette)
+    pal = [im.quantize(colors=96, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE) for im in small[::2]]
+    pal[0].save(MEDIA / "banner.gif", save_all=True, append_images=pal[1:], duration=200, loop=0, optimize=True)
     for name in ("banner.webp", "banner.gif"):
         print(name, (MEDIA / name).stat().st_size // 1024, "KB")
 

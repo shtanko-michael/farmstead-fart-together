@@ -101,8 +101,10 @@ public final class Toots {
                 SIZE[tier], JET_BLAST, new int[]{5}));
         }
         if ((flags & Proto.GOLDEN) != 0) {
-            CLOUDS.add(new Cloud(who, style.withShape(Style.Shape.SPARKS), new Random(seed ^ 0x6A09E667L), 3, hue, own,
-                1f, 0, new int[]{ticks + 6}));
+            // a few extra pale-gold puffs make it glow (soft puffs, no sparks: owner's rule for the default look)
+            Style shine = new Style(Style.ColorMode.SOLID, GOLD_LIGHT, GOLD_LIGHT, Style.Shape.PUFF, style.size(), 1f, 1f, 1f,
+                style.sound(), 1f, 1f, Style.Pose.NONE);
+            CLOUDS.add(new Cloud(who, shine, new Random(seed ^ 0x6A09E667L), 1, hue, own, 1.2f, 0, new int[]{ticks / 2 + 2}));
         }
         if (cloud != null && linger > 0 && radius > 0 && ClientConfig.LINGER.on()) {
             LINGERS.add(new Linger(cloud, radius, style, new Random(seed ^ 0x5DEECE66DL), hue, own, new int[]{linger}));
@@ -113,7 +115,7 @@ public final class Toots {
      * Fart Together: {@code count} players tooted together. The chorus (one more layered sound per player, up to
      * three), a ring of colourful puffs bursting out of the centre and the big shared cloud lingering there.
      */
-    public static void combo(Minecraft mc, int count, long seed, Vec3 pos, float radius, int linger) {
+    public static void combo(Minecraft mc, int count, long seed, Vec3 pos, float radius, int linger, int color) {
         if (mc.level == null) return;
         Random rnd = new Random(seed);
         float volume = ClientConfig.VOLUME.floatValue();
@@ -124,16 +126,27 @@ public final class Toots {
                 mc.level.playLocalSound(pos.x, pos.y, pos.z, event, SoundSource.PLAYERS, volume, 0.85f + 0.12f * i, false);
             }
         }
-        if (TestHooks.enabled()) FartTogether.LOGGER.info("test: combo count={} radius={} linger={}", count, radius, linger);
-        int ring = Math.max(1, Math.round(Math.min(40, 8 + 4 * count) * ClientConfig.PARTICLES.floatValue()));
-        for (int i = 0; i < ring; i++) {
-            double a = Math.PI * 2 * i / ring;
-            double speed = 0.04 + rnd.nextDouble() * 0.03;
-            puff(mc, pos.x, pos.y + 0.2, pos.z, Math.cos(a) * speed, 0.01 + rnd.nextDouble() * 0.015, Math.sin(a) * speed,
-                Colors.lerp(Colors.hue((float) i / ring), 0xFFFFFF, 0.45f), 1.6f, rnd);
+        if (TestHooks.enabled()) {
+            FartTogether.LOGGER.info("test: combo count={} radius={} linger={} color={}", count, radius, linger, Integer.toHexString(color));
         }
-        if (linger > 0 && radius > 0 && ClientConfig.LINGER.on()) {
-            LINGERS.add(new Linger(pos, radius, Style.SIMPLE, new Random(seed ^ 0x5DEECE66DL), rnd.nextFloat(), true, new int[]{linger}));
+        // one big merged cloud spanning the players: many large soft puffs filling a flattened dome around the centre,
+        // rising slowly and fading over three to four seconds (several times the volume of a single toot)
+        // the dome hugs the players: about the server's area, a little tighter so a camera next to them stays outside
+        double r = Math.min(6.0, Math.max(2.0, (radius > 0 ? radius : 2.5 + count) * 0.7));
+        // the players' colours, pulled towards the gas green so the shared cloud still reads as gas
+        int gas = Colors.lerp(color, Style.DEFAULT_COLOR, 0.45f);
+        int puffs = Math.round(Math.min(160, 30 + 22 * count) * ClientConfig.PARTICLES.floatValue());
+        for (int i = 0; i < puffs; i++) {
+            double x, y, z;
+            do {
+                x = rnd.nextDouble() * 2 - 1;
+                y = rnd.nextDouble();
+                z = rnd.nextDouble() * 2 - 1;
+            } while (x * x + y * y + z * z > 1);
+            int tint = Colors.lerp(gas, 0xFFFFFF, rnd.nextFloat() * 0.18f);
+            bigPuff(mc, pos.x + x * r, pos.y - 0.3 + y * r * 0.6, pos.z + z * r,
+                x * 0.01, 0.006 + rnd.nextDouble() * 0.01, z * 0.01, tint, 1.3f + rnd.nextFloat() * 0.7f, rnd,
+                70 + rnd.nextInt(14) + Math.min(40, linger / 4));
         }
     }
 
@@ -217,6 +230,18 @@ public final class Toots {
         if (particle == null) return;
         if (type != ParticleTypes.NOTE && type != ParticleTypes.HEART) tint(particle, color(s, c.hue(), r));
         particle.scale(s.size() * c.size());
+    }
+
+    /** A combo puff: like {@link #puff} but big and with its own lifetime. */
+    private static void bigPuff(Minecraft mc, double x, double y, double z, double dx, double dy, double dz, int rgb,
+                                float size, Random r, int life) {
+        if (mc.player != null && mc.options.getCameraType().isFirstPerson()
+            && mc.player.getEyePosition().distanceToSqr(x, y, z) < 2.2 * 2.2) return;
+        Particle particle = mc.particleEngine.createParticle(PUFF, x, y, z, dx, dy, dz);
+        if (particle == null) return;
+        tint(particle, rgb);
+        particle.scale(size);
+        particle.setLifetime(life);
     }
 
     /**

@@ -160,18 +160,26 @@ public final class TootServer {
         player.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(player));
     }
 
-    /** A combo grew: one shared cloud at the players' centre, bigger with every player, and the chorus. */
+    /**
+     * A combo grew: one shared cloud at the players' centre that spans all of them (and grows with every player), the
+     * chorus, and the clients' big merged puff cloud of the same size.
+     */
     private static void combo(ServerPlayer player, ServerLevel level, Together.Combo combo, boolean water) {
-        double radius = 0;
-        int linger = 0;
-        if (ServerConfig.CLOUD.on() && !water) {
-            radius = Math.min(12.0, meta(player, Meta.CLOUD_RADIUS) * (1 + 0.35 * combo.count()));
-            linger = (int) Math.round(ServerConfig.CLOUD_SECONDS.value() * 20 * 1.5);
-            GasClouds.add(level, combo.centre(), radius, linger, player.getUUID());
-        }
         Vec3 c = combo.centre();
+        double span = 0;
+        for (ServerPlayer p : combo.players()) span = Math.max(span, Math.sqrt(p.position().distanceToSqr(c.x, p.getY(), c.z)));
+        double radius = Math.min(12.0, Math.max(span + 1.5, meta(player, Meta.CLOUD_RADIUS) * (1 + 0.5 * combo.count())));
+        // the visible cloud lingers 3.5 s and a little longer with more players; the server's area as long
+        int linger = Math.min(140, 50 + 10 * combo.count());
+        if (ServerConfig.CLOUD.on() && !water) GasClouds.add(level, c, radius, linger, player.getUUID());
+        else {
+            radius = 0;
+            linger = 0;
+        }
+        java.util.List<java.util.UUID> members = new java.util.ArrayList<>();
+        for (ServerPlayer p : combo.players()) members.add(p.getUUID());
         toNear(player, new Proto.ComboS2C(combo.count(), RANDOM.nextLong(), (float) c.x, (float) c.y, (float) c.z,
-            (float) radius, linger));
+            (float) radius, linger, members));
         Together.celebrate(combo);
     }
 
@@ -296,6 +304,11 @@ public final class TootServer {
         /*return player.level();
         *///?} else
         return player.serverLevel();
+    }
+
+    /** {@code /fart testcombo}: stand-in participants around {@code player} (test rig only). */
+    public static void injectFakeToots(ServerPlayer player, int count) {
+        Together.injectFake(level(player), player.position().add(0, 0.75, 0), count, now());
     }
 
     private static long now() {

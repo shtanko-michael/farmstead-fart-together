@@ -51,7 +51,7 @@ A, B = "Tester", "Tester2"
 CFG = "farmstead_fart_together-client.toml"
 
 STYLE_A = {"color": '"pumpkin"', "particle": '"puff"', "size": "1.4", "amount": "1.6", "sound": '"trumpet"', "pose": '"classic"'}
-STYLE_B = {"color": '"lilac"', "particle": '"snow"', "size": "1.0", "amount": "1.4", "sound": '"squeaky"', "pose": '"hero"'}
+STYLE_B = {"color": '"lilac"', "particle": '"puff"', "size": "1.2", "amount": "1.4", "sound": '"squeaky"', "pose": '"hero"'}
 
 
 def client_file(style: dict, others: str = "theirs") -> str:
@@ -128,7 +128,7 @@ def main() -> int:
         cb = client(B, dir_b, ["-PclientDir=client2"])
         time.sleep(8)
 
-        for c in ("gamerule doMobSpawning false", "time set noon", "gamerule doDaylightCycle false", "weather clear",
+        for c in ("effect clear @a", "gamerule doMobSpawning false", "time set noon", "gamerule doDaylightCycle false", "weather clear",
                   f"fill -6 {Y - 1} -6 6 {Y - 1} 6 grass_block", f"fill -6 {Y} -6 6 {Y + 5} 6 air", "kill @e[type=!player]",
                   f"gamemode creative {A}", f"gamemode creative {B}"):
             rcon.cmd(c)
@@ -338,7 +338,7 @@ def m3(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path, server) -> None:
     rcon.cmd(f"fart charge {A} full")
     time.sleep(1)
     # a full hold takes 1.6 s: slow falling keeps Tester in the air that long (it wears off before the toot)
-    rcon.cmd(f"effect give {A} minecraft:slow_falling 3")
+    rcon.cmd(f"effect give {A} minecraft:slow_falling 3 0 true")  # hidden particles
     rcon.cmd(f"tp {A} 0.5 {Y + 9} 0.5 0 0")
     rcon.cmd(f"tp {B} 8.5 {Y} 0.5 90 -22")
     rec(dir_b, "jet", 4)
@@ -359,13 +359,16 @@ def m3(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path, server) -> None:
     rcon.cmd(f"tp {A} 0.5 {Y} 0.5 0 0")
     rcon.cmd(f"tp {B} 4.5 {Y} -0.5 90 10")
     rcon.cmd(f"gamemode survival {A}")
-    rcon.cmd(f"effect give {A} minecraft:hunger 3 255")
+    rcon.cmd(f"effect give {A} minecraft:hunger 3 255 true")
     time.sleep(3.2)
     rcon.cmd(f"item replace entity {A} hotbar.0 with minecraft:enchanted_golden_apple")
     hook(dir_a, "camera", "first")
     time.sleep(0.5)
     hook(dir_a, "use", "45")
     time.sleep(3.2)
+    # the apple's own effects (regeneration, absorption...) swirl around the player: not ours, cleared for the shot;
+    # the golden gas stays (it is the mod's flag, not an effect)
+    rcon.cmd(f"effect clear {A}")
     rcon.cmd(f"gamemode creative {A}")
     hook(dir_a, "camera", "back")
     rcon.cmd(f"fart charge {A} full")
@@ -376,6 +379,7 @@ def m3(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path, server) -> None:
     sb.shot("14-b-golden")
     time.sleep(3)
 
+    rcon.cmd("effect clear @a")
     print("15. under water")
     rcon.cmd(f"fill 7 {Y - 1} -5 17 {Y + 5} 5 glass")
     rcon.cmd(f"fill 8 {Y} -4 16 {Y + 4} 4 water")
@@ -390,23 +394,25 @@ def m3(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path, server) -> None:
     rcon.cmd(f"fill 7 {Y} -5 17 {Y + 5} 5 air")
     rcon.cmd(f"fill 7 {Y - 1} -5 17 {Y - 1} 5 grass_block")
 
+    rcon.cmd("effect clear @a")
     print("16. Fart Together: both at once")
-    rcon.cmd(f"tp {A} -1.0 {Y} 0.5 0 0")
-    rcon.cmd(f"tp {B} 2.0 {Y} 0.5 0 0")
+    # side by side facing the same way; Tester2's front camera looks back at both, the shared cloud rises behind them
+    rcon.cmd(f"tp {A} -0.4 {Y} 0.5 0 0")
+    rcon.cmd(f"tp {B} 1.4 {Y} 0.5 0 0")
     rcon.cmd(f"fart charge {A} full")
     rcon.cmd(f"fart charge {B} full")
     hook(dir_a, "camera", "back")
-    hook(dir_b, "camera", "back")
+    hook(dir_b, "camera", "front")
     time.sleep(1.5)
-    hook(dir_a, "toot", "900")
-    rec(dir_b, "together", 5)
-    hook(dir_b, "toot", "1000")
-    time.sleep(1.4)
+    rec(dir_b, "together", 6)
+    hook(dir_a, "toot", "1500")
+    hook(dir_b, "toot", "1600")
+    time.sleep(2.3)
     sb.shot("16-b-together")
     sa.shot("16-a-together")
-    time.sleep(1.5)
+    time.sleep(1.2)
     sb.shot("16-b-together-cloud")
-    time.sleep(2)
+    time.sleep(3)
 
     print("17-18. advancements, trades, loot")
     log = "".join(server.lines)
