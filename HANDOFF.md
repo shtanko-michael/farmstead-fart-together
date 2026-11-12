@@ -79,3 +79,10 @@ Written by the session that built and released Footprints, the first mod of the 
 2. Scaffold from Footprints: rename package (`online.farmsteadminecraft.<mod>`), mod id, branding,
    config, lang tooling, test hooks; get all 22 targets building and a start-up smoke test on each loader.
 3. Then PLAN.md MVP: key, pose animation, particle cloud, sounds, server-side rules, LuckPerms.
+
+## Owner's decisions (2026-11-12)
+
+- Fabric API on Fabric: **yes** (networking and own sounds/resources); NeoForge/Forge stay dependency-free.
+- LuckPerms node names keep the loader's modid prefix: `farmstead_fart_together.*`.
+- Origin: https://github.com/shtanko-michael/farmstead-fart-together (pushed). Catalogue projects
+  with slug `farmstead-fart-together` are created by the owner when there is something to release.
