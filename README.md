@@ -8,7 +8,7 @@ Make your toot your own: cloud colour, particles, sound, pitch and pose, and you
 
 Requires: nothing on NeoForge and Forge; [Fabric API](https://modrinth.com/mod/fabric-api) on Fabric.
 
-Install it on the server and on clients. A client on a server without the mod still toots, but only for itself; players without the mod see nothing. Beans and cabbage are registered items, so the loaders turn away clients without the mod; a dedicated server that does not want the items sets `items.enabled = false` in its file (restart) and lets everyone in.
+Install it on the server and on clients. A client on a server without the mod still toots, but only for itself; players without the mod see nothing. Clients without the mod can log in (checked with a vanilla login on NeoForge and Fabric 1.21.1), but beans, cabbage and the crops are registered content they do not know: what a vanilla client does when it meets them (an item in a hand, a crop in a chunk) is not tested yet. A dedicated server with vanilla players can set `items.enabled = false` in its file (restart): then the mod adds nothing to the registries; the server log then shows a few harmless "unknown key" lines for the mod's recipe and loot tables.
 
 ## Gas
 

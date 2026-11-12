@@ -21,8 +21,8 @@ import online.farmsteadminecraft.farttogether.FartTogether;
  * from its own registration event; the fields are set as the objects are made.
  *
  * <p>A dedicated server can switch them off ({@code items.enabled = false} in the server file, read before
- * registration): then nothing of ours is in the registries and vanilla clients may join. A client always registers
- * them, so it can join servers either way.</p>
+ * registration): then nothing of ours is in the registries, the safe choice for servers with vanilla players (they
+ * can log in either way, but would meet unknown items and blocks otherwise). A client always registers them.</p>
  */
 public final class Content {
     public static Block BEAN_CROP, CABBAGE_CROP;
