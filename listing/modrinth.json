@@ -1,0 +1,25 @@
+{
+  "title": "Fart Together",
+  "summary": "Cartoon toots with real gameplay: hold to charge, gas from beans, clouds that scare mobs, jet jumps and team combos. Family-friendly.",
+  "categories": ["game-mechanics", "social"],
+  "additional_categories": ["food", "cursed"],
+  "client_side": "required",
+  "server_side": "required",
+  "license_id": "MIT",
+  "license_url": "https://github.com/shtanko-michael/farmstead-fart-together/blob/main/LICENSE",
+  "source_url": "https://github.com/shtanko-michael/farmstead-fart-together",
+  "issues_url": "https://github.com/shtanko-michael/farmstead-fart-together/issues",
+  "wiki_url": "https://github.com/shtanko-michael/farmstead-fart-together#readme",
+  "body": "listing/modrinth.md",
+  "icon": "docs/media/icon-512.png",
+  "gallery": [
+    {"file": "docs/media/gallery/01-together.jpg", "title": "Fart Together", "description": "Two friends toot at once: one big shared cloud, a chorus and a combo counter.", "featured": true},
+    {"file": "docs/media/gallery/02-toot.jpg", "title": "Your own style", "description": "A soft puff in your colour, a pose and a cartoon sound, the same for everyone around."},
+    {"file": "docs/media/gallery/03-scare.jpg", "title": "Mobs keep their distance", "description": "Zombies and animals run from the cloud you leave behind."},
+    {"file": "docs/media/gallery/04-golden.jpg", "title": "Pure gold", "description": "After an enchanted golden apple the next toot is golden."},
+    {"file": "docs/media/gallery/05-hold.jpg", "title": "Hold to charge", "description": "The gas meter lights up the part that will come out."},
+    {"file": "docs/media/gallery/06-crops.jpg", "title": "Beans and cabbage", "description": "New crops that grow like wheat and fill your gas meter."},
+    {"file": "docs/media/gallery/07-my-style.jpg", "title": "My style", "description": "Pick colour, particles, sound and pose with a live preview."},
+    {"file": "docs/media/gallery/08-bubbles.jpg", "title": "Hot tub", "description": "Under water a toot is a stream of bubbles."}
+  ]
+}

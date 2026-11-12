@@ -1,0 +1,219 @@
+"""Builds the documentation pages from README.md / README.ru.md / CHANGELOG.md, so the README stays the one
+source: docs/wiki/<lang>/<page>.md (plain pages, no H1: titles come from the outside), then
+
+  --github <dir>   a GitHub wiki checkout: Home.md, <Page>.md, <Page>-ru.md, _Sidebar.md, _Footer.md
+  --site <dir>     the Farmstead docs site content dir (game/neoessentials/docs/site/content):
+                   fart-together/ and en/fart-together/ with their _meta.json
+
+    python -I tools/build_wiki.py [--github <dir>] [--site <dir>]
+"""
+import json
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+RAW = "https://raw.githubusercontent.com/shtanko-michael/farmstead-fart-together/main/"
+REPO = "https://github.com/shtanko-michael/farmstead-fart-together"
+
+# page slug -> README sections (by position, so both languages split the same way)
+# README section order: 0 see, 1 features, 2 downloads, 3 settings, 4 server file, 5 commands, 6 permissions,
+# 7 update check, 8 faq, 9 building, 10 license
+PAGES = [
+    ("", [0, 1]),
+    ("installation", [2, 7]),
+    ("settings", [3]),
+    ("server", [4, 6]),
+    ("commands", [5]),
+    ("faq", [8]),
+    ("building", [9, 10]),
+]
+
+TITLES = {
+    "en": {"": ("Fart Together", "Overview"), "installation": ("Installation and versions", None),
+           "settings": ("Settings", None), "server": ("Server rules and permissions", None),
+           "commands": ("Commands", None), "faq": ("FAQ", None), "building": ("Building from source", None),
+           "changelog": ("Changelog", None)},
+    "ru": {"": ("Fart Together", "Обзор"), "installation": ("Установка и версии", None),
+           "settings": ("Настройки", None), "server": ("Правила сервера и права", None),
+           "commands": ("Команды", None), "faq": ("Вопросы", None), "building": ("Сборка из исходников", None),
+           "changelog": ("История версий", None)},
+}
+LEDES = {
+    "en": {"": "Cartoon toots with real gameplay: hold to charge, gas from beans, clouds that scare mobs, jet jumps and team combos. Fabric, Forge and NeoForge from 1.20.1 to 26.3.",
+           "installation": "Which jar for which game, what else you need (Fabric API on Fabric) and the once-per-start update check.",
+           "settings": "Every key of config/farmstead_fart_together-client.toml, the presets and your own style.",
+           "server": "The server file, gas food data, LuckPerms nodes and meta.",
+           "commands": "The /fart and /farttogether commands.",
+           "faq": "Kids and streams, other animation mods, modded food.",
+           "building": "Building the 22 jars, the art and sound tools, and the license.",
+           "changelog": "What changed in each release."},
+    "ru": {"": "Мультяшные залпы с настоящим геймплеем: удержание для силы, газ от бобов, облака, пугающие мобов, реактивный прыжок и комбо с друзьями. Fabric, Forge и NeoForge от 1.20.1 до 26.3.",
+           "installation": "Какой jar для какой игры, что ещё нужно (Fabric API на Fabric) и проверка обновлений при запуске.",
+           "settings": "Все ключи config/farmstead_fart_together-client.toml, пресеты и свой стиль.",
+           "server": "Серверный конфиг, данные газа, узлы и meta LuckPerms.",
+           "commands": "Команды /fart и /farttogether.",
+           "faq": "Дети и стримы, другие моды анимаций, модовая еда.",
+           "building": "Сборка 22 jar, инструменты арта и звука, лицензия.",
+           "changelog": "Что менялось в каждом релизе."},
+}
+CTA = {
+    lang: '<p class="cta-row"><a class="cta" href="https://modrinth.com/mod/farmstead-fart-together">⬇ Modrinth</a> '
+          '<a class="cta cta-soft" href="https://www.curseforge.com/minecraft/mc-mods/farmstead-fart-together">CurseForge</a> '
+          f'<a class="cta cta-soft" href="{REPO}">GitHub</a></p>'
+    for lang in ("en", "ru")
+}
+CHANGELOG_RU_NOTE = "Список изменений ведётся на английском, как в репозитории.\n\n"
+
+
+def sections(text):
+    parts = re.split(r"(?m)^(## .*)$", text)
+    intro = parts[0]
+    out = []
+    for i in range(1, len(parts), 2):
+        out.append((parts[i][3:].strip(), parts[i + 1].strip()))
+    return intro, out
+
+
+def absolute(md):
+    # relative media and file links -> absolute, the pages live outside the repo
+    md = re.sub(r"\]\((docs/[^)]+)\)", lambda m: f"]({RAW}{m.group(1)})", md)
+    md = re.sub(r'src="(docs/[^"]+)"', lambda m: f'src="{RAW}{m.group(1)}"', md)
+    md = re.sub(r"\]\(((?:LICENSE|CHANGELOG\.md|README[^)]*|listing/[^)]+))\)", lambda m: f"]({REPO}/blob/main/{m.group(1)})", md)
+    return md
+
+
+def build_pages():
+    pages = {}
+    for lang, readme in (("en", "README.md"), ("ru", "README.ru.md")):
+        intro, secs = sections((ROOT / readme).read_text(encoding="utf-8"))
+        intro_text = "\n".join(l for l in intro.splitlines()
+                               if not l.startswith(("# ", "[![", "<p align", "<img", "![")) and "README" not in l).strip()
+        for slug, idx in PAGES:
+            body = []
+            if slug == "":
+                body.append(CTA[lang])
+                body.append(intro_text)
+            for i in idx:
+                title, text = secs[i]
+                if slug in ("settings", "commands", "faq") and len(idx) == 1:
+                    body.append(text)
+                else:
+                    body.append(f"## {title}\n\n{text}")
+            pages[(lang, slug)] = absolute("\n\n".join(b for b in body if b).strip() + "\n")
+        log = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        log = re.sub(r"(?s)^# Changelog\s*", "", log)
+        pages[(lang, "changelog")] = (CHANGELOG_RU_NOTE if lang == "ru" else "") + log.strip() + "\n"
+    return pages
+
+
+def write_local(pages):
+    for (lang, slug), text in pages.items():
+        p = ROOT / "docs" / "wiki" / lang / f"{slug or 'index'}.md"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8")
+
+
+def github_name(lang, slug):
+    title = TITLES["en"][slug][0] if slug else "Home"
+    name = title.replace(" ", "-")
+    return name if lang == "en" else name + "-ru"
+
+
+def write_github(pages, out):
+    out = Path(out)
+    order = [s for s, _ in PAGES] + ["changelog"]
+    for (lang, slug), text in pages.items():
+        title, _ = TITLES[lang][slug]
+        head = f"> {LEDES[lang][slug]}\n\n"
+        if slug == "":
+            other = "[Русская версия](Home-ru)" if lang == "en" else "[English version](Home)"
+            head = f"{other}\n\n" + head
+        text = re.sub(r'<p class="cta-row">.*?</p>\n*', "", text)
+        (out / f"{github_name(lang, slug)}.md").write_text(head + text, encoding="utf-8")
+    side = ["**Fart Together**", ""]
+    for slug in order:
+        side.append(f"- [{TITLES['en'][slug][1] or TITLES['en'][slug][0]}]({github_name('en', slug)})")
+    side += ["", "**По-русски**", ""]
+    for slug in order:
+        side.append(f"- [{TITLES['ru'][slug][1] or TITLES['ru'][slug][0]}]({github_name('ru', slug)})")
+    (out / "_Sidebar.md").write_text("\n".join(side) + "\n", encoding="utf-8")
+    (out / "_Footer.md").write_text(
+        "Made by [Farmstead](https://farmsteadminecraft.online) · [Modrinth](https://modrinth.com/mod/farmstead-fart-together) · "
+        "[CurseForge](https://www.curseforge.com/minecraft/mc-mods/farmstead-fart-together) · "
+        f"[Source]({REPO}) · [Issues]({REPO}/issues)\n", encoding="utf-8")
+
+
+KEYWORDS = ["Fart Together", "farmstead_fart_together", "/fart", "toot", "залп"]
+
+
+def site_gallery(md):
+    """The README's picture table -> a responsive grid of figures (styled by .gallery in the site's CSS)."""
+    lines = md.splitlines()
+    out, i = [], 0
+    while i < len(lines):
+        if lines[i].startswith("| ![") or lines[i].startswith("| <img"):
+            figs = []
+            j = i
+            while j < len(lines) and lines[j].startswith("|"):
+                row = lines[j]
+                if "![" in row:
+                    imgs = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", row)
+                    caps = [c.strip() for c in lines[j + 1].strip().strip("|").split("|")] if j + 1 < len(lines) else []
+                    for k, (alt, src) in enumerate(imgs):
+                        cap = caps[k] if k < len(caps) else alt
+                        figs.append(f'<figure><img src="{src}" alt="{alt}" loading="lazy"><figcaption>{cap}</figcaption></figure>')
+                    j += 2
+                else:
+                    j += 1
+            # drop the empty header rows that came before
+            while out and out[-1].startswith("|"):
+                out.pop()
+            out.append('<div class="gallery">' + "".join(figs) + "</div>")
+            i = j
+            continue
+        out.append(lines[i])
+        i += 1
+    text = "\n".join(out)
+    text = re.sub(r"(?m)^(More pictures in|Больше картинок в) \[[^\]]*\]\([^)]*\)\.?$",
+                  lambda m: ("More pictures in the " if m.group(1).startswith("More") else "Больше картинок в ")
+                  + f"[{'gallery' if m.group(1).startswith('More') else 'галерее'}]({REPO}/tree/main/docs/media/gallery).", text)
+    return text
+
+
+def write_site(pages, content):
+    content = Path(content)
+    for lang, base in (("ru", content / "fart-together"), ("en", content / "en" / "fart-together")):
+        base.mkdir(parents=True, exist_ok=True)
+        groups = {"ru": ["Начало", "Справочник", "Помощь"], "en": ["Start", "Reference", "Help"]}[lang]
+        group_of = {"": 0, "installation": 0, "settings": 1, "server": 1, "commands": 1, "faq": 2, "building": 2, "changelog": 2}
+        meta = {"groups": groups, "pages": []}
+        for slug, _ in PAGES + [("changelog", None)]:
+            title, nav = TITLES[lang][slug]
+            entry = {"slug": slug, "title": title if slug else "Fart Together", "group": groups[group_of[slug]],
+                     "lede": LEDES[lang][slug], "keywords": KEYWORDS + [title]}
+            if slug == "":
+                entry["source"] = "index.md"
+                entry["navTitle"] = nav
+            if slug == "settings":
+                entry["wide"] = True
+            meta["pages"].append(entry)
+            text = pages[(lang, slug)]
+            if slug == "":
+                text = site_gallery(text)
+            (base / f"{slug or 'index'}.md").write_text(text, encoding="utf-8")
+        if lang == "ru":
+            (base / "_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        else:
+            (base / "_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    pages = build_pages()
+    write_local(pages)
+    args = sys.argv[1:]
+    if "--github" in args:
+        write_github(pages, args[args.index("--github") + 1])
+    if "--site" in args:
+        write_site(pages, args[args.index("--site") + 1])
+    print(f"{len(pages)} pages")
