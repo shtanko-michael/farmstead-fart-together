@@ -1,0 +1,25 @@
+{
+  "parent": "farmstead_fart_together:first_toot",
+  "display": {
+    "icon": {
+      "id": "minecraft:pufferfish"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.bubbles.title",
+      "fallback": "Hot Tub"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.bubbles.description",
+      "fallback": "Toot under water"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

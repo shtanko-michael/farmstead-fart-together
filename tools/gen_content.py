@@ -222,10 +222,78 @@ def data() -> None:
     write(DATA / "gas_foods/fart_together.json", {"foods": GAS_OWN})
 
 
+# The mod's advancements (Husbandry tab). Granted from code (server Awards.java) through one impossible criterion,
+# with vanilla icons so they load even where the server switched the mod's items off.
+# id: (parent, icon, frame, hidden, English title, English description)
+ADVANCEMENTS = {
+    "first_toot": ("minecraft:husbandry/root", "minecraft:lime_dye", "task", False,
+                   "Excuse Me!", "Let one go for the first time"),
+    "legendary_toot": ("first_toot", "minecraft:dragon_breath", "goal", False,
+                       "Legendary", "Hold the key until a full gas meter comes out at once"),
+    "jet_jump": ("first_toot", "minecraft:firework_rocket", "task", False,
+                 "Jet Propulsion", "Toot in mid-air and fly a little higher"),
+    "golden_toot": ("first_toot", "minecraft:enchanted_golden_apple", "goal", False,
+                    "Pure Gold", "Toot after eating an enchanted golden apple"),
+    "bubbles": ("first_toot", "minecraft:pufferfish", "task", False,
+                "Hot Tub", "Toot under water"),
+    "wither_toot": ("legendary_toot", "minecraft:wither_skeleton_skull", "challenge", True,
+                    "Biological Weapon", "Toot near the Wither"),
+    "together_2": ("first_toot", "minecraft:note_block", "task", False,
+                   "Fart Together!", "Toot at the same moment as a friend next to you"),
+    "together_4": ("together_2", "minecraft:jukebox", "goal", False,
+                   "Gas Quartet", "Four players toot together"),
+    "together_8": ("together_4", "minecraft:bell", "challenge", False,
+                   "Wind Orchestra", "Eight players toot together"),
+}
+
+# 26.x: villager trades are data (villager_trade + tags). Older versions add the same trades from code (Trades.java).
+# Each trade only loads where our items exist (the server may switch them off); the tag entries are optional.
+TRADES = {
+    # name: (level, wants (id, count), gives (id, count), max uses, xp)
+    "beans_emerald": (1, (f"{NS}:beans", 20), ("minecraft:emerald", 1), 16, 2),
+    "cabbage_emerald": (2, (f"{NS}:cabbage", 12), ("minecraft:emerald", 1), 16, 10),
+    "emerald_bowl_of_beans": (2, ("minecraft:emerald", 1), (f"{NS}:bowl_of_beans", 1), 12, 5),
+}
+
+
+def advancements() -> None:
+    for adv, (parent, icon, frame, hidden, title, desc) in ADVANCEMENTS.items():
+        key = f"advancements.{NS}.{adv}"
+        write(DATA / f"advancement/{adv}.json", {
+            "parent": parent if ":" in parent else f"{NS}:{parent}",
+            "display": {
+                "icon": {"id": icon},
+                "title": {"translate": f"{key}.title", "fallback": title},
+                "description": {"translate": f"{key}.description", "fallback": desc},
+                "frame": frame, "show_toast": True, "announce_to_chat": True, "hidden": hidden,
+            },
+            "criteria": {"done": {"trigger": "minecraft:impossible"}},
+        })
+
+
+def trades() -> None:
+    by_level: dict[int, list] = {}
+    for name, (level, wants, gives, uses, xp) in TRADES.items():
+        ours = [i for i, _ in (wants, gives) if i.startswith(NS)]
+        trade = {
+            "wants": {"id": wants[0], "count": wants[1]} if wants[1] > 1 else {"id": wants[0]},
+            "gives": {"id": gives[0], "count": gives[1]} if gives[1] > 1 else {"id": gives[0]},
+            "max_uses": uses, "reputation_discount": 0.05, "xp": xp,
+            "neoforge:conditions": [{"type": "neoforge:item_exists", "item": i} for i in ours],
+            "fabric:load_conditions": [{"condition": "fabric:registry_contains", "registry": "minecraft:item", "values": ours}],
+        }
+        write(DATA / f"villager_trade/farmer/{name}.json", trade)
+        by_level.setdefault(level, []).append({"id": f"{NS}:farmer/{name}", "required": False})
+    for level, values in by_level.items():
+        write(RES / f"data/minecraft/tags/villager_trade/farmer/level_{level}.json", {"replace": False, "values": values})
+
+
 def main() -> int:
     made = draw_textures("--textures" in sys.argv)
     models_and_states()
     data()
+    advancements()
+    trades()
     print("textures drawn:", *made, sep="\n  ") if made else print("textures kept")
     return 0
 

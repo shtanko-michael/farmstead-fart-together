@@ -1,0 +1,25 @@
+{
+  "parent": "farmstead_fart_together:together_4",
+  "display": {
+    "icon": {
+      "id": "minecraft:bell"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.together_8.title",
+      "fallback": "Wind Orchestra"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.together_8.description",
+      "fallback": "Eight players toot together"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

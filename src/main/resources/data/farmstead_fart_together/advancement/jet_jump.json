@@ -1,0 +1,25 @@
+{
+  "parent": "farmstead_fart_together:first_toot",
+  "display": {
+    "icon": {
+      "id": "minecraft:firework_rocket"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.jet_jump.title",
+      "fallback": "Jet Propulsion"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.jet_jump.description",
+      "fallback": "Toot in mid-air and fly a little higher"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

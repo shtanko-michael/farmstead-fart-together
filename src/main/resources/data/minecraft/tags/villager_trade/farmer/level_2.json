@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "farmstead_fart_together:farmer/cabbage_emerald",
+      "required": false
+    },
+    {
+      "id": "farmstead_fart_together:farmer/emerald_bowl_of_beans",
+      "required": false
+    }
+  ]
+}

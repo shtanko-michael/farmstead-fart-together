@@ -27,6 +27,8 @@ public final class Gas {
 
     private static final Map<UUID, Double> CHARGE = new HashMap<>();
     private static final Set<UUID> DISABLED = new HashSet<>();
+    /** Ate an enchanted golden apple since the last toot (not saved: a restart eats it). */
+    private static final Set<UUID> GOLDEN = new HashSet<>();
     private static Path file;
     private static boolean dirty;
 
@@ -64,7 +66,17 @@ public final class Gas {
         return false;
     }
 
+    public static void makeGolden(UUID player) {
+        GOLDEN.add(player);
+    }
+
+    /** Whether this toot is golden; the gold is used up by it. */
+    public static boolean takeGolden(UUID player) {
+        return GOLDEN.remove(player);
+    }
+
     public static void load(MinecraftServer server) {
+        GOLDEN.clear();
         CHARGE.clear();
         DISABLED.clear();
         dirty = false;
@@ -109,6 +121,7 @@ public final class Gas {
 
     public static void reset() {
         save();
+        GOLDEN.clear();
         CHARGE.clear();
         DISABLED.clear();
         file = null;

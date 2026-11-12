@@ -8,6 +8,10 @@ import net.minecraft.server.level.ServerPlayer;
  */
 public enum Perm {
     USE("use", true, false),
+    /** A toot in mid-air pushes the player up. */
+    JETJUMP("jetjump", true, false),
+    /** Counts in Fart Together combos. */
+    TOGETHER("together", true, false),
     STYLE_CUSTOM("style.custom", true, false),
     STYLE_RAINBOW("style.rainbow", false, false),
     STYLE_HUGE("style.huge", false, false),

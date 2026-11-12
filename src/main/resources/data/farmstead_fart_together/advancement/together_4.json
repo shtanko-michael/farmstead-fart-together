@@ -1,0 +1,25 @@
+{
+  "parent": "farmstead_fart_together:together_2",
+  "display": {
+    "icon": {
+      "id": "minecraft:jukebox"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.together_4.title",
+      "fallback": "Gas Quartet"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.together_4.description",
+      "fallback": "Four players toot together"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

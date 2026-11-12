@@ -46,9 +46,11 @@ def run(ctx):
     ctx.wait(1)
     ctx.cmd(f"fart charge {p} full")
     ctx.wait(1)
-    hook(ctx, "toot")
-    ctx.wait(0.4)
+    hook(ctx, "toot", "1700")  # hold to charge: a full-strength toot
+    ctx.wait(2.1)
     ctx.shot("smoke-toot")
+    ctx.wait(1.2)
+    ctx.shot("smoke-toot-later")
     # M2: a crop row and the gas meter after a bowl of beans
     ctx.cmds(f"fill -3 {Y - 1} 3 3 {Y - 1} 3 farmland",
              *[f"setblock {i - 3} {Y} 3 farmstead_fart_together:{'bean' if i % 2 else 'cabbage'}_crop[age={min(7, i + 2)}]" for i in range(6)],

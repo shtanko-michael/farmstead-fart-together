@@ -1,0 +1,25 @@
+{
+  "parent": "farmstead_fart_together:first_toot",
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_golden_apple"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.golden_toot.title",
+      "fallback": "Pure Gold"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.golden_toot.description",
+      "fallback": "Toot after eating an enchanted golden apple"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

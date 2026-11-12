@@ -1,0 +1,27 @@
+{
+  "wants": {
+    "id": "farmstead_fart_together:cabbage",
+    "count": 12
+  },
+  "gives": {
+    "id": "minecraft:emerald"
+  },
+  "max_uses": 16,
+  "reputation_discount": 0.05,
+  "xp": 10,
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:item_exists",
+      "item": "farmstead_fart_together:cabbage"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:registry_contains",
+      "registry": "minecraft:item",
+      "values": [
+        "farmstead_fart_together:cabbage"
+      ]
+    }
+  ]
+}

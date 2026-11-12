@@ -22,8 +22,11 @@ import online.farmsteadminecraft.farttogether.content.Content;
 import online.farmsteadminecraft.farttogether.net.Network;
 import online.farmsteadminecraft.farttogether.server.Drops;
 import online.farmsteadminecraft.farttogether.server.FartCommands;
+import online.farmsteadminecraft.farttogether.server.Loot;
 import online.farmsteadminecraft.farttogether.server.ServerConfig;
 import online.farmsteadminecraft.farttogether.server.TootServer;
+//? if <26.1
+import online.farmsteadminecraft.farttogether.server.Trades;
 
 @Mod(FartTogether.MOD_ID)
 public class FartTogetherNeoForge {
@@ -60,6 +63,20 @@ public class FartTogetherNeoForge {
                 Drops.broke(player.level(), player, event.getPos(), event.getState());
             }
         });
+        //? if <26.1 {
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.village.VillagerTradesEvent event) -> {
+            //? if >=1.21.11 {
+            /*if (!event.getType().equals(net.minecraft.world.entity.npc.villager.VillagerProfession.FARMER)) return;
+            *///?} else
+            if (!event.getType().equals(net.minecraft.world.entity.npc.VillagerProfession.FARMER)) return;
+            for (int level = 1; level <= 2; level++) event.getTrades().get(level).addAll(Trades.farmer(level));
+        });
+        //?}
+        //? if <26.3 {
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.LootTableLoadEvent event) -> {
+            if (Loot.wants(event.getName().toString())) event.getTable().addPool(Loot.pool());
+        });
+        //?}
         FartTogether.init();
         if (ModLoaderAccess.get().isClient()) {
             NeoForgeClientHooks.register(modContainer, modEventBus);

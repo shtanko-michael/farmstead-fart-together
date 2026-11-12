@@ -26,6 +26,8 @@ public final class TootServer {
     private static final double RANGE = 96;
     /** Strength tiers by the share of a full meter: small, medium, big, full. */
     public static final String[] POWER_NAMES = {"small", "medium", "big", "full"};
+    /** A key press shorter than this is a tap: the smallest toot. */
+    static final int TAP_MILLIS = 250;
 
     private static final class State {
         Style style = Style.SIMPLE;
@@ -53,7 +55,7 @@ public final class TootServer {
         Proto.ToServer msg = Proto.decodeToServer(data);
         if (msg == null) return;
         if (msg instanceof Proto.HelloC2S hello) hello(player, hello);
-        else if (msg instanceof Proto.TootC2S toot) toot(player);
+        else if (msg instanceof Proto.TootC2S toot) toot(player, Math.max(0, Math.min(60_000, toot.holdMillis())));
         else if (msg instanceof Proto.StyleC2S style) style(player, style.style());
     }
 
@@ -68,7 +70,7 @@ public final class TootServer {
         State state = MODDED.computeIfAbsent(player.getUUID(), u -> new State());
         state.style = StyleRules.clamp(hello.style(), p -> allowed(player, p));
         state.lastStyle = now();
-        send(player, new Proto.HelloS2C(Proto.VERSION, (int) (meta(player, Meta.COOLDOWN) * 1000)));
+        send(player, hello(player));
         sendCharge(player);
         // the newcomer learns everybody's style, everybody learns the newcomer's (and the newcomer its clamped own)
         for (ServerPlayer other : server.getPlayerList().getPlayers()) {
@@ -79,7 +81,7 @@ public final class TootServer {
         broadcastStyle(server, player.getUUID(), state.style);
     }
 
-    private static void toot(ServerPlayer player) {
+    private static void toot(ServerPlayer player, int holdMillis) {
         State state = MODDED.get(player.getUUID());
         if (state == null || !player.isAlive() || player.isSpectator()) return;
         if (!allowed(player, Perm.USE) || Gas.disabled(player.getUUID())) return;
@@ -88,44 +90,109 @@ public final class TootServer {
         // a little slack so a client that waited exactly the cooldown is not refused for network jitter
         if (now - state.lastToot < cooldown - 150) return;
 
-        double charge = Gas.charge(player.getUUID());
-        int max = Gas.max(player);
+        // the hold: a tap lets out the least a toot needs, a full hold everything the player has
+        double hold = holdMillis < TAP_MILLIS ? 0 : Math.min(1.0, holdMillis / (ServerConfig.FULL_HOLD.value() * 1000));
         double share;
         if (ServerConfig.CHARGE_REQUIRED.on()) {
-            if (charge < Math.min(ServerConfig.CHARGE_MIN.value(), max)) {
+            double charge = Gas.charge(player.getUUID());
+            int max = Gas.max(player);
+            double min = Math.min(ServerConfig.CHARGE_MIN.value(), max);
+            if (charge < min) {
                 sendCharge(player);
                 return;
             }
-            share = Math.min(1.0, charge / max);
-            Gas.set(player, 0);
+            double amount = Math.min(charge, min + (charge - min) * hold);
+            share = Math.min(1.0, amount / max);
+            Gas.set(player, charge - amount);
             sendCharge(player);
         } else {
-            share = 0.5;
+            share = 0.25 + 0.75 * hold;
         }
         state.lastToot = now;
         int power = share >= 0.999 ? 3 : share >= 0.67 ? 2 : share >= 0.34 ? 1 : 0;
 
-        // the cloud: behind the hips, bigger and longer with more gas
+        ServerLevel level = level(player);
+        boolean water = player.isUnderWater();
+        boolean golden = ServerConfig.GOLDEN.on() && Gas.takeGolden(player.getUUID());
+        boolean jet = !water && ServerConfig.JET.on() && !player.onGround() && !player.isPassenger()
+            && !player.getAbilities().flying && !player.isFallFlying() && allowed(player, Perm.JETJUMP);
+        if (jet) jet(player, share);
+
+        // the cloud: behind the hips, bigger and longer with more gas; under water the gas bubbles up and is gone
         double yaw = Math.toRadians(player.yBodyRot);
         Vec3 pos = player.position().add(Math.sin(yaw) * 0.6, player.isCrouching() ? 0.55 : 0.75, -Math.cos(yaw) * 0.6);
         double radius = 0;
         int linger = 0;
-        if (ServerConfig.CLOUD.on()) {
+        if (ServerConfig.CLOUD.on() && !water) {
             radius = meta(player, Meta.CLOUD_RADIUS) * (0.5 + 0.5 * share);
             linger = (int) Math.round(ServerConfig.CLOUD_SECONDS.value() * 20 * (0.35 + 0.65 * share));
-            GasClouds.add(level(player), pos, radius, linger, player.getUUID());
+            GasClouds.add(level, pos, radius, linger, player.getUUID());
         }
-        Proto.TootS2C out = new Proto.TootS2C(player.getUUID(), power, RANDOM.nextLong(),
-            (float) pos.x, (float) pos.y, (float) pos.z, (float) radius, linger);
+        int flags = (jet ? Proto.JET : 0) | (golden ? Proto.GOLDEN : 0) | (water ? Proto.WATER : 0);
+        toNear(player, new Proto.TootS2C(player.getUUID(), power, RANDOM.nextLong(),
+            (float) pos.x, (float) pos.y, (float) pos.z, (float) radius, linger, flags));
+
+        Awards.FIRST.grant(player);
+        if (power == 3) Awards.LEGENDARY.grant(player);
+        if (jet) Awards.JET.grant(player);
+        if (golden) Awards.GOLDEN.grant(player);
+        if (water) Awards.BUBBLES.grant(player);
+        if (witherNear(player, level)) Awards.WITHER.grant(player);
+
+        if (ServerConfig.TOGETHER.on() && allowed(player, Perm.TOGETHER)) {
+            Together.Combo combo = Together.toot(player, level, pos, now);
+            if (combo.count() >= 2) combo(player, level, combo, water);
+        }
+    }
+
+    /** Jet jump: a push up (weaker toots push less), no fall damage from before, a moment of slow falling. */
+    private static void jet(ServerPlayer player, double share) {
+        Vec3 v = player.getDeltaMovement();
+        double push = ServerConfig.JET_STRENGTH.value() * (0.4 + 0.6 * share);
+        player.setDeltaMovement(v.x, Math.max(v.y, 0) + push, v.z);
+        player.resetFallDistance();
+        int slow = (int) Math.round(ServerConfig.JET_SLOW_FALL.value() * 20);
+        if (slow > 0) {
+            player.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING,
+                slow, 0, false, false, true));
+        }
+        // the client moves its own player: tell it about the push now
+        player.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(player));
+    }
+
+    /** A combo grew: one shared cloud at the players' centre, bigger with every player, and the chorus. */
+    private static void combo(ServerPlayer player, ServerLevel level, Together.Combo combo, boolean water) {
+        double radius = 0;
+        int linger = 0;
+        if (ServerConfig.CLOUD.on() && !water) {
+            radius = Math.min(12.0, meta(player, Meta.CLOUD_RADIUS) * (1 + 0.35 * combo.count()));
+            linger = (int) Math.round(ServerConfig.CLOUD_SECONDS.value() * 20 * 1.5);
+            GasClouds.add(level, combo.centre(), radius, linger, player.getUUID());
+        }
+        Vec3 c = combo.centre();
+        toNear(player, new Proto.ComboS2C(combo.count(), RANDOM.nextLong(), (float) c.x, (float) c.y, (float) c.z,
+            (float) radius, linger));
+        Together.celebrate(combo);
+    }
+
+    private static boolean witherNear(ServerPlayer player, ServerLevel level) {
+        // by class: 26.2 moved the entity type constants out of EntityType
+        return !level.getEntitiesOfClass(net.minecraft.world.entity.boss.wither.WitherBoss.class,
+            player.getBoundingBox().inflate(24), net.minecraft.world.entity.LivingEntity::isAlive).isEmpty();
+    }
+
+    /** Sends to every modded player in this level within hearing range of {@code player}. */
+    private static void toNear(ServerPlayer player, Proto.ToClient msg) {
         for (ServerPlayer other : server(player).getPlayerList().getPlayers()) {
             if (!MODDED.containsKey(other.getUUID()) || other.level() != player.level()) continue;
             if (other.distanceToSqr(player) > RANGE * RANGE) continue;
-            send(other, out);
+            send(other, msg);
         }
     }
 
     /** A player finished eating or drinking {@code stack}: gas from the food tables. */
     public static void ate(ServerPlayer player, ItemStack stack, boolean food) {
+        if (ServerConfig.GOLDEN.on() && stack.is(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE)) Gas.makeGolden(player.getUUID());
         Integer w = GasFoods.weight(server(player), stack, food);
         if (w == null || w == 0) return;
         if (Gas.set(player, Gas.charge(player.getUUID()) + w)) sendCharge(player);
@@ -167,9 +234,14 @@ public final class TootServer {
     public static void resendAll(MinecraftServer server) {
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
             if (!MODDED.containsKey(p.getUUID())) continue;
-            send(p, new Proto.HelloS2C(Proto.VERSION, (int) (meta(p, Meta.COOLDOWN) * 1000)));
+            send(p, hello(p));
             sendCharge(p);
         }
+    }
+
+    private static Proto.HelloS2C hello(ServerPlayer player) {
+        return new Proto.HelloS2C(Proto.VERSION, (int) (meta(player, Meta.COOLDOWN) * 1000),
+            (int) (ServerConfig.FULL_HOLD.value() * 1000));
     }
 
     private static void broadcastStyle(MinecraftServer server, UUID who, Style style) {
@@ -194,6 +266,7 @@ public final class TootServer {
     public static void reset() {
         MODDED.clear();
         GasClouds.reset();
+        Together.reset();
         Gas.reset();
         current = null;
     }

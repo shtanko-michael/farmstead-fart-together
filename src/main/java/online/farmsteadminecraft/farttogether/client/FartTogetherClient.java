@@ -41,7 +41,7 @@ public final class FartTogetherClient {
     public static void tryIt() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
-        Toots.play(mc, mc.player, ClientConfig.style(), new java.util.Random().nextLong(), true, 1, null, 0, 0);
+        Toots.play(mc, mc.player, ClientConfig.style(), new java.util.Random().nextLong(), true, 1, null, 0, 0, 0);
     }
 
     /** {@code /farttogether config}: the chat screen closes after the command, so open on the next tick. */

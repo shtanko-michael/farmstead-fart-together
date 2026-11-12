@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {
+      "id": "minecraft:lime_dye"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.first_toot.title",
+      "fallback": "Excuse Me!"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.first_toot.description",
+      "fallback": "Let one go for the first time"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

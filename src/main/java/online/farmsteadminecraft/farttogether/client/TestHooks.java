@@ -76,6 +76,12 @@ public final class TestHooks {
                     String arg = Files.readString(req).trim();
                     Files.deleteIfExists(req);
                     useTicks = arg.isEmpty() ? 40 : Integer.parseInt(arg);
+                } else if (file.equals("screen.close")) {
+                    Files.deleteIfExists(req);
+                    //? if >=26.2 {
+                    /*mc.gui.setScreen(null);
+                    *///?} else
+                    mc.setScreen(null);
                 } else if (file.equals("try.it")) {
                     Files.deleteIfExists(req);
                     //? if >=26.2 {
@@ -93,9 +99,10 @@ public final class TestHooks {
                         default -> net.minecraft.client.CameraType.FIRST_PERSON;
                     });
                 } else if (file.equals("toot")) {
-                    // presses the toot key once (the same path as the real key)
+                    // holds the toot key for the given milliseconds (empty: a tap), the same path as the real key
+                    String text = Files.readString(req).trim();
                     Files.deleteIfExists(req);
-                    ClientNet.tootPressed(mc);
+                    ClientNet.holdFor(mc, text.isEmpty() ? 0 : Integer.parseInt(text));
                 } else if (file.equals("chat")) {
                     // sends a chat line (players tell each other in the two-client scene who did what)
                     String text = Files.readString(req).trim();

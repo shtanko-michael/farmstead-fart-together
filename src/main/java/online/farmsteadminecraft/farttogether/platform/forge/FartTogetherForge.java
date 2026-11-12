@@ -22,8 +22,10 @@ import online.farmsteadminecraft.farttogether.content.Content;
 import online.farmsteadminecraft.farttogether.net.Network;
 import online.farmsteadminecraft.farttogether.server.Drops;
 import online.farmsteadminecraft.farttogether.server.FartCommands;
+import online.farmsteadminecraft.farttogether.server.Loot;
 import online.farmsteadminecraft.farttogether.server.ServerConfig;
 import online.farmsteadminecraft.farttogether.server.TootServer;
+import online.farmsteadminecraft.farttogether.server.Trades;
 
 @Mod(FartTogether.MOD_ID)
 public class FartTogetherForge {
@@ -59,6 +61,13 @@ public class FartTogetherForge {
             if (!event.isCanceled() && event.getPlayer() instanceof ServerPlayer player) {
                 Drops.broke(player.level(), player, event.getPos(), event.getState());
             }
+        });
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.village.VillagerTradesEvent event) -> {
+            if (event.getType() != net.minecraft.world.entity.npc.VillagerProfession.FARMER) return;
+            for (int level = 1; level <= 2; level++) event.getTrades().get(level).addAll(Trades.farmer(level));
+        });
+        MinecraftForge.EVENT_BUS.addListener((net.minecraftforge.event.LootTableLoadEvent event) -> {
+            if (Loot.wants(event.getName().toString())) event.getTable().addPool(Loot.pool());
         });
         FartTogether.init();
         if (ModLoaderAccess.get().isClient()) {

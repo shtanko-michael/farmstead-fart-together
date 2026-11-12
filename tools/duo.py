@@ -19,8 +19,18 @@ M2 (gas, cloud, items, commands, My style):
   8. a row of bean and cabbage crops at every stage;
   9. /fart toggle Tester2: Tester2's toot is refused; toggled back;
  10. Tester's settings open on the My style tab: preview, then "Play".
+M3 (hold to charge, jet jump, golden gas, bubbles, Fart Together, advancements, trades and loot):
+ 11. Tester holds the key on a full meter: the HUD build-up half way and at full strength, then what is left;
+ 12. a tap lets out only charge.minToToot (60 -> 50);
+ 13. jet jump: Tester toots in mid-air and rises (heights from the server), the blast seen by Tester2;
+ 14. an enchanted golden apple, then a golden toot;
+ 15. under water: bubbles;
+ 16. both toot together: the combo (both clients), the chorus and the shared cloud seen by Tester2;
+ 17. advancements announced in the server log;
+ 18. farmer villagers offer bean trades; dungeon and village chests roll beans.
 
-Screenshots and duo-report.txt land in build/scenes/<target>/duo/. Subtitles are on and the game volume is very low
+Screenshots and duo-report.txt land in build/scenes/<target>/duo/. With --record the listing's clips are recorded
+too (every tick's frame in run/<target>/client*/recordings/<clip>/; media/gifs_from_frames.py makes the GIFs). Subtitles are on and the game volume is very low
 so the subtitle line proves the sound was played on the listener's side without filling the room with noise.
 """
 from __future__ import annotations
@@ -50,6 +60,15 @@ def client_file(style: dict, others: str = "theirs") -> str:
     return "\n".join(lines) + "\n"
 
 
+RECORD = "--record" in sys.argv
+
+
+def rec(client_dir: Path, clip: str, seconds: float) -> None:
+    """Starts recording a listing clip on that client (only with --record)."""
+    if RECORD:
+        hook(client_dir, "record", f"{clip} {seconds}")
+
+
 def hook(client_dir: Path, name: str, text: str = "") -> None:
     d = client_dir / "testhooks"
     d.mkdir(parents=True, exist_ok=True)
@@ -72,6 +91,11 @@ def main() -> int:
         "enable-rcon": "true", "rcon.port": str(rcon_port), "rcon.password": RCON_PASSWORD, "difficulty": "peaceful",
         "spawn-protection": "0", "max-tick-time": "-1", "enforce-secure-profile": "false", "max-players": "4",
     })
+    # tools/vanilla.py may have left the items switched off: this scene needs them
+    server_cfg = server_dir / "config" / "farmstead_fart_together-server.toml"
+    if server_cfg.exists():
+        server_cfg.write_text(re.sub(r"(?m)^enabled = false$", "enabled = true", server_cfg.read_text(encoding="utf-8")),
+                              encoding="utf-8")
     options = dict(CLIENT_OPTIONS, showSubtitles="true", soundCategory_master="0.02", renderDistance="6")
     for d, style in ((dir_a, STYLE_A), (dir_b, STYLE_B)):
         write_props(d / "options.txt", options)
@@ -119,7 +143,9 @@ def main() -> int:
         sb = Ctx(rcon, dir_b, out, None)
 
         def toot_and_shoot(who: Path, tag: str, shooters) -> None:
-            hook(who, "toot")
+            # a quick tap would be a small toot now (hold to charge): hold long enough for full strength
+            hook(who, "toot", "1700")
+            time.sleep(1.7)
             time.sleep(0.45)
             for ctx, name in shooters:
                 ctx.shot(f"{tag}-{name}")
@@ -131,6 +157,7 @@ def main() -> int:
         full(A)
         full(B)
         print("1. Tester toots")
+        rec(dir_b, "toot", 3.5)
         toot_and_shoot(dir_a, "1-a-toots", [(sb, "seen-by-b"), (sa, "seen-by-a")])
         time.sleep(3.5)  # server cooldown is 3 s
 
@@ -163,6 +190,9 @@ def main() -> int:
         toot_and_shoot(dir_a, "4-a-toots-b-simple", [(sb, "seen-by-b")])
         time.sleep(3.5)
         m2(rcon, dir_a, dir_b, sa, sb, out)
+        hook(dir_a, "screen.close")
+        time.sleep(1)
+        m3(rcon, dir_a, dir_b, sa, sb, out, server)
 
         report(out, ca, cb, server)
         return 0
@@ -214,8 +244,9 @@ def m2(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path) -> None:
     hook(dir_b, "camera", "first")
     rcon.cmd(f"fart charge {A} full")
     time.sleep(1)
-    hook(dir_a, "toot")
-    time.sleep(0.6)
+    rec(dir_b, "scare", 6)
+    hook(dir_a, "toot", "1700")
+    time.sleep(2.3)
     sb.shot("7-b-cloud")
     time.sleep(1.6)
     sb.shot("7-b-mobs-run")
@@ -261,6 +292,7 @@ def m2(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path) -> None:
     hook(dir_a, "config.tab", "my_style")
     time.sleep(1.5)
     sa.shot("10-a-my-style")
+    rec(dir_a, "mystyle", 3)
     hook(dir_a, "mystyle.play")
     time.sleep(0.5)
     sa.shot("10-a-my-style-play")
@@ -268,9 +300,143 @@ def m2(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path) -> None:
     print("\n".join(lines))
 
 
+def m3(rcon, dir_a: Path, dir_b: Path, sa, sb, out: Path, server) -> None:
+    lines = []
+    rcon.cmd(f"fill -12 {Y} -12 12 {Y + 12} 12 air")
+    rcon.cmd(f"fill -12 {Y - 1} -12 12 {Y - 1} 12 grass_block")
+    rcon.cmd("kill @e[type=!player]")
+
+    print("11. hold to charge: the HUD build-up")
+    rcon.cmd(f"tp {A} 0.5 {Y} 0.5 180 15")
+    hook(dir_a, "camera", "back")
+    rcon.cmd(f"fart charge {A} full")
+    time.sleep(1)
+    rec(dir_a, "hold", 4.5)
+    hook(dir_a, "toot", "2600")
+    time.sleep(0.75)
+    sa.shot("11-a-hold-half")
+    time.sleep(1.0)
+    sa.shot("11-a-hold-full")
+    time.sleep(1.6)
+    sa.shot("11-a-after-release")
+    time.sleep(3.2)
+
+    print("12. a tap: only the minimum comes out")
+    rcon.cmd(f"fart charge {A} 60")
+    time.sleep(0.5)
+    hook(dir_a, "toot")
+    time.sleep(1)
+    sa.shot("12-a-after-tap")
+    lines.append("tap: see the last 'test: charge' lines of client-Tester.log (60 -> 50 expected)")
+    time.sleep(3)
+
+    print("13. jet jump")
+    rcon.cmd(f"gamemode survival {A}")
+    rcon.cmd(f"tp {B} 7.5 {Y + 3} 0.5 90 10")
+    hook(dir_b, "camera", "first")
+    hook(dir_a, "camera", "back")
+    rcon.cmd(f"fart charge {A} full")
+    time.sleep(1)
+    # a full hold takes 1.6 s: slow falling keeps Tester in the air that long (it wears off before the toot)
+    rcon.cmd(f"effect give {A} minecraft:slow_falling 3")
+    rcon.cmd(f"tp {A} 0.5 {Y + 9} 0.5 0 0")
+    rcon.cmd(f"tp {B} 8.5 {Y} 0.5 90 -22")
+    rec(dir_b, "jet", 4)
+    hook(dir_a, "toot", "1600")
+    heights = []
+    t0 = time.time()
+    for i in range(16):
+        q = pos(rcon, A)
+        heights.append(f"{time.time() - t0:.1f}s y={q[1] - Y:.2f}" if q else "?")
+        if i == 9:
+            sb.shot("13-b-jet")
+        time.sleep(0.15)
+    lines.append("jet jump (A's height above the ground, toot after 1.6 s): " + ", ".join(heights))
+    time.sleep(2)
+    rcon.cmd(f"gamemode creative {A}")
+
+    print("14. golden gas")
+    rcon.cmd(f"tp {A} 0.5 {Y} 0.5 0 0")
+    rcon.cmd(f"tp {B} 4.5 {Y} -0.5 90 10")
+    rcon.cmd(f"gamemode survival {A}")
+    rcon.cmd(f"effect give {A} minecraft:hunger 3 255")
+    time.sleep(3.2)
+    rcon.cmd(f"item replace entity {A} hotbar.0 with minecraft:enchanted_golden_apple")
+    hook(dir_a, "camera", "first")
+    time.sleep(0.5)
+    hook(dir_a, "use", "45")
+    time.sleep(3.2)
+    rcon.cmd(f"gamemode creative {A}")
+    hook(dir_a, "camera", "back")
+    rcon.cmd(f"fart charge {A} full")
+    time.sleep(1)
+    rec(dir_b, "golden", 4)
+    hook(dir_a, "toot", "1700")
+    time.sleep(2.1)
+    sb.shot("14-b-golden")
+    time.sleep(3)
+
+    print("15. under water")
+    rcon.cmd(f"fill 7 {Y - 1} -5 17 {Y + 5} 5 glass")
+    rcon.cmd(f"fill 8 {Y} -4 16 {Y + 4} 4 water")
+    rcon.cmd(f"tp {A} 12.5 {Y} 0.5 0 0")
+    rcon.cmd(f"fart charge {A} full")
+    time.sleep(1.5)
+    rec(dir_a, "bubbles", 4)
+    hook(dir_a, "toot", "1700")
+    time.sleep(2.0)
+    sa.shot("15-a-bubbles")
+    time.sleep(3)
+    rcon.cmd(f"fill 7 {Y} -5 17 {Y + 5} 5 air")
+    rcon.cmd(f"fill 7 {Y - 1} -5 17 {Y - 1} 5 grass_block")
+
+    print("16. Fart Together: both at once")
+    rcon.cmd(f"tp {A} -1.0 {Y} 0.5 0 0")
+    rcon.cmd(f"tp {B} 2.0 {Y} 0.5 0 0")
+    rcon.cmd(f"fart charge {A} full")
+    rcon.cmd(f"fart charge {B} full")
+    hook(dir_a, "camera", "back")
+    hook(dir_b, "camera", "back")
+    time.sleep(1.5)
+    hook(dir_a, "toot", "900")
+    rec(dir_b, "together", 5)
+    hook(dir_b, "toot", "1000")
+    time.sleep(1.4)
+    sb.shot("16-b-together")
+    sa.shot("16-a-together")
+    time.sleep(1.5)
+    sb.shot("16-b-together-cloud")
+    time.sleep(2)
+
+    print("17-18. advancements, trades, loot")
+    log = "".join(server.lines)
+    made = sorted(set(re.findall(r"has (?:made the advancement|completed the challenge|reached the goal) \[([^\]]+)\]", log)))
+    lines.append("advancements announced: " + ", ".join(made))
+    found = 0
+    for i in range(10):
+        level = 1 if i < 6 else 2
+        rcon.cmd(f"summon minecraft:villager {-8 + i} {Y} 8 {{NoAI:1b,Tags:[\"ft{i}\"],VillagerData:{{profession:\"minecraft:farmer\",level:{level},type:\"minecraft:plains\"}}}}")
+        text = rcon.cmd(f"data get entity @e[tag=ft{i},limit=1] Offers") or ""
+        mine = re.findall(r"farmstead_fart_together:(\w+)", text)
+        if mine:
+            found += 1
+        lines.append(f"farmer level {level} #{i}: " + (", ".join(sorted(set(mine))) if mine else "vanilla trades only"))
+    lines.append(f"farmers offering our trades: {found} of 10")
+    rcon.cmd(f"clear {B}")
+    for table in ("minecraft:chests/simple_dungeon", "minecraft:chests/village/village_plains_house"):
+        for _ in range(15):
+            rcon.cmd(f"loot give {B} loot {table}")
+        beans = (rcon.cmd(f"clear {B} farmstead_fart_together:beans 0") or "").strip()
+        seeds = (rcon.cmd(f"clear {B} farmstead_fart_together:cabbage_seeds 0") or "").strip()
+        lines.append(f"15 x {table}: beans: {beans} | cabbage seeds: {seeds}")
+        rcon.cmd(f"clear {B}")
+    (out / "m3-report.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print("\n".join(lines))
+
+
 def report(out: Path, ca: Proc, cb: Proc, server: Proc) -> None:
     la, lb, ls = "".join(ca.lines), "".join(cb.lines), "".join(server.lines)
-    toot = r"test: toot by (\w+) sound=(\w+) shape=(\w+) color=(\w+) own=(\w+) power=(\d) radius=([\d.]+) linger=(\d+)"
+    toot = r"test: toot by (\w+) sound=(\w+) shape=(\w+) color=(\w+) own=(\w+) power=(\d) radius=([\d.]+) linger=(\d+) flags=(\d+)"
     heard_b = re.findall(toot, lb)
     heard_a = re.findall(toot, la)
     charges_a = re.findall(r"test: charge (\d+/\d+) min (\d+) enabled (\w+)", la)
@@ -284,6 +450,7 @@ def report(out: Path, ca: Proc, cb: Proc, server: Proc) -> None:
         *[f"  {h}" for h in heard_a],
         "gas A was told (charge/max, min, enabled):",
         *[f"  {c}" for c in charges_a],
+        "combos seen (A, B): " + str(la.count("test: combo count=")) + ", " + str(lb.count("test: combo count=")),
         "styles B received:",
         *[f"  {s[:220]}" for s in styles_b],
     ]

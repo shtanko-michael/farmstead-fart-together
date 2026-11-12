@@ -25,6 +25,12 @@ public final class ClientNet {
     /** Set by the server's hello; 0 = no modded server (local mode). */
     private static int serverVersion;
     private static int cooldownMillis = 3_000;
+    /** How long a hold takes to reach full strength (the server's {@code toot.fullChargeSeconds}). */
+    private static int fullHoldMillis = 1_500;
+    /** A press shorter than this is a tap (the server uses the same number). */
+    static final int TAP_MILLIS = 250;
+    /** When the toot key went down (-1: not holding); a test hook may schedule the release. */
+    private static long holdStart = -1, autoRelease = -1;
     private static long lastToot;
     private static boolean hasTooted;
     private static long lastStyleSent;
@@ -54,6 +60,10 @@ public final class ClientNet {
             if (world == null) reset();
             world = mc.level;
         }
+        if (autoRelease > 0 && now() >= autoRelease) {
+            autoRelease = -1;
+            keyUp(mc);
+        }
         Network net = Network.get();
         if (!helloSent && net != null && net.serverHasChannel()) {
             helloSent = true;
@@ -74,6 +84,8 @@ public final class ClientNet {
         serverVersion = 0;
         styleDirty = false;
         charge = chargeMax = chargeMin = 0;
+        fullHoldMillis = 1_500;
+        holdStart = autoRelease = -1;
         tootEnabled = true;
         STYLES.clear();
     }
@@ -83,9 +95,12 @@ public final class ClientNet {
         styleDirty = true;
     }
 
-    /** The toot key: ask the server, or toot locally if it does not run the mod. */
-    public static void tootPressed(Minecraft mc) {
-        if (mc.player == null) return;
+    /**
+     * The toot key went down (called every tick while it is held): starts a hold, unless the toot would be refused
+     * anyway (then the action bar says why) or the cooldown is still running.
+     */
+    public static void keyDown(Minecraft mc) {
+        if (holdStart >= 0 || mc.player == null) return;
         long now = now();
         if (serverHasMod()) {
             if (!tootEnabled || charge < chargeMin) {
@@ -103,15 +118,63 @@ public final class ClientNet {
                 return;
             }
             if (hasTooted && now - lastToot < cooldownMillis) return;
-            hasTooted = true;
-            lastToot = now;
-            Network.get().toServer(Proto.encode(new Proto.TootC2S(0)));
-        } else {
-            if (hasTooted && now - lastToot < LOCAL_COOLDOWN_MILLIS) return;
-            hasTooted = true;
-            lastToot = now;
-            Toots.play(mc, mc.player, ClientConfig.style(), RANDOM.nextLong(), true, 1, null, 0, 0);
+        } else if (hasTooted && now - lastToot < LOCAL_COOLDOWN_MILLIS) {
+            return;
         }
+        holdStart = now;
+    }
+
+    /** The toot key was let go: the hold so far fires (a tap when it was short). */
+    public static void keyUp(Minecraft mc) {
+        if (holdStart < 0 || mc.player == null) {
+            holdStart = -1;
+            return;
+        }
+        long now = now();
+        int held = (int) Math.min(60_000, now - holdStart);
+        holdStart = -1;
+        hasTooted = true;
+        lastToot = now;
+        if (serverHasMod()) {
+            Network.get().toServer(Proto.encode(new Proto.TootC2S(held)));
+        } else {
+            // only for yourself: the hold alone sets the strength
+            float share = held < TAP_MILLIS ? 0f : Math.min(1f, held / 1500f);
+            int power = share >= 0.999f ? 3 : share >= 0.67f ? 2 : share >= 0.34f ? 1 : 0;
+            Toots.play(mc, mc.player, ClientConfig.style(), RANDOM.nextLong(), true, power, null, 0, 0, 0);
+        }
+    }
+
+    /** A screen opened over a held key: drop the hold without tooting. */
+    public static void cancelHold() {
+        holdStart = -1;
+        autoRelease = -1;
+    }
+
+    /** Test hooks: hold the key for {@code millis}, then let go (0: a tap). */
+    public static void holdFor(Minecraft mc, int millis) {
+        keyDown(mc);
+        if (holdStart < 0) return;
+        if (millis <= 0) keyUp(mc);
+        else autoRelease = now() + millis;
+    }
+
+    /**
+     * How far the current hold has built up, 0 (a tap) .. 1 (full strength), or -1 when the key is not held. On a
+     * modded server the server's {@code toot.fullChargeSeconds} sets the pace; alone it is a second and a half.
+     */
+    public static float holdShare() {
+        if (holdStart < 0) return -1;
+        long held = now() - holdStart;
+        if (held < TAP_MILLIS) return 0;
+        return Math.min(1f, held / (float) (serverHasMod() ? fullHoldMillis : 1500));
+    }
+
+    /** Gas the current hold would let out if the key were let go now (what the server will compute). */
+    public static float holdGas() {
+        float share = holdShare();
+        if (share < 0) return 0;
+        return Math.min(charge, chargeMin + (charge - chargeMin) * share);
     }
 
     /** Gas for the HUD meter: {@code [charge, max, min]}, max 0 when the server does not run the mod. */
@@ -126,6 +189,7 @@ public final class ClientNet {
         if (msg instanceof Proto.HelloS2C hello) {
             serverVersion = hello.version();
             cooldownMillis = hello.cooldownMillis();
+            fullHoldMillis = Math.max(1, hello.fullHoldMillis());
             FartTogether.LOGGER.info("server runs Fart Together protocol {}, cooldown {} ms", hello.version(), hello.cooldownMillis());
         } else if (msg instanceof Proto.StyleS2C style) {
             STYLES.put(style.who(), style.style());
@@ -142,7 +206,11 @@ public final class ClientNet {
             if (who == null) return;
             boolean own = who == mc.player;
             Toots.play(mc, who, styleFor(mc, toot.who(), own), toot.seed(), own, toot.power(),
-                new net.minecraft.world.phys.Vec3(toot.x(), toot.y(), toot.z()), toot.radius(), toot.lingerTicks());
+                new net.minecraft.world.phys.Vec3(toot.x(), toot.y(), toot.z()), toot.radius(), toot.lingerTicks(), toot.flags());
+        } else if (msg instanceof Proto.ComboS2C combo) {
+            if (mc.level == null || mc.player == null) return;
+            Toots.combo(mc, combo.count(), combo.seed(), new net.minecraft.world.phys.Vec3(combo.x(), combo.y(), combo.z()),
+                combo.radius(), combo.lingerTicks());
         }
     }
 

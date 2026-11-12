@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "farmstead_fart_together:farmer/beans_emerald",
+      "required": false
+    }
+  ]
+}

@@ -17,37 +17,53 @@ import online.farmsteadminecraft.farttogether.style.Style;
  * mismatch both sides behave as if the other had no mod.</p>
  */
 public final class Proto {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     /** No message of ours is anywhere near this; anything larger is dropped unread. */
     public static final int MAX_BYTES = 512;
 
-    private static final int HELLO = 0, TOOT = 1, STYLE = 2, CHARGE = 3;
+    private static final int HELLO = 0, TOOT = 1, STYLE = 2, CHARGE = 3, COMBO = 4;
 
     private Proto() {
     }
 
     public sealed interface ToServer permits HelloC2S, TootC2S, StyleC2S {}
 
-    public sealed interface ToClient permits HelloS2C, TootS2C, StyleS2C, ChargeS2C {}
+    public sealed interface ToClient permits HelloS2C, TootS2C, StyleS2C, ChargeS2C, ComboS2C {}
 
     /** First message of a modded client: its protocol version and its style. */
     public record HelloC2S(int version, Style style) implements ToServer {}
 
-    /** "Toot now"; {@code power} is unused (0): the server takes the strength from the player's gas. */
-    public record TootC2S(int power) implements ToServer {}
+    /**
+     * "Toot now": the toot key was held for {@code holdMillis} (0 for a tap). The server turns the hold into how much
+     * of the player's gas comes out, clamped by the gas they have and by its own rules.
+     */
+    public record TootC2S(int holdMillis) implements ToServer {}
 
     /** The player changed their style. */
     public record StyleC2S(Style style) implements ToServer {}
 
-    /** The server's answer to hello: its version and the toot cooldown, so the client does not spam the key. */
-    public record HelloS2C(int version, int cooldownMillis) implements ToClient {}
+    /**
+     * The server's answer to hello: its version, the toot cooldown (so the client does not spam the key) and how long
+     * a hold takes to reach full strength (so the meter's build-up matches what the server will let out).
+     */
+    public record HelloS2C(int version, int cooldownMillis, int fullHoldMillis) implements ToClient {}
 
     /**
      * Player {@code who} tooted with strength {@code power} (0 small .. 3 full meter); {@code seed} makes every
      * receiver pick the same sound and cloud. The gas cloud stays at {@code x y z} with {@code radius} for
      * {@code lingerTicks} (0: no cloud).
      */
-    public record TootS2C(UUID who, int power, long seed, float x, float y, float z, float radius, int lingerTicks)
+    public record TootS2C(UUID who, int power, long seed, float x, float y, float z, float radius, int lingerTicks,
+                          int flags) implements ToClient {}
+
+    /** {@link TootS2C#flags}: a jet jump (the toot pushed its player up), golden gas, under water (bubbles). */
+    public static final int JET = 1, GOLDEN = 2, WATER = 4;
+
+    /**
+     * Fart Together: {@code count} players tooted together near {@code x y z}; every receiver plays the chorus and
+     * draws the big shared cloud ({@code radius}, {@code lingerTicks}) from the same {@code seed}.
+     */
+    public record ComboS2C(int count, long seed, float x, float y, float z, float radius, int lingerTicks)
         implements ToClient {}
 
     /** This player's gas: {@code charge} of {@code max}; a toot needs {@code min} (0 when gas is not required). */
@@ -65,7 +81,7 @@ public final class Proto {
             m.style().write(buf);
         } else if (msg instanceof TootC2S m) {
             buf.writeByte(TOOT);
-            buf.writeVarInt(m.power());
+            buf.writeVarInt(m.holdMillis());
         } else if (msg instanceof StyleC2S m) {
             buf.writeByte(STYLE);
             m.style().write(buf);
@@ -79,10 +95,21 @@ public final class Proto {
             buf.writeByte(HELLO);
             buf.writeVarInt(m.version());
             buf.writeVarInt(m.cooldownMillis());
+            buf.writeVarInt(m.fullHoldMillis());
         } else if (msg instanceof TootS2C m) {
             buf.writeByte(TOOT);
             buf.writeUUID(m.who());
             buf.writeVarInt(m.power());
+            buf.writeLong(m.seed());
+            buf.writeFloat(m.x());
+            buf.writeFloat(m.y());
+            buf.writeFloat(m.z());
+            buf.writeFloat(m.radius());
+            buf.writeVarInt(m.lingerTicks());
+            buf.writeVarInt(m.flags());
+        } else if (msg instanceof ComboS2C m) {
+            buf.writeByte(COMBO);
+            buf.writeVarInt(m.count());
             buf.writeLong(m.seed());
             buf.writeFloat(m.x());
             buf.writeFloat(m.y());
@@ -124,9 +151,11 @@ public final class Proto {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(data));
         try {
             return switch (buf.readByte()) {
-                case HELLO -> new HelloS2C(buf.readVarInt(), buf.readVarInt());
+                case HELLO -> new HelloS2C(buf.readVarInt(), buf.readVarInt(), buf.readVarInt());
                 case TOOT -> new TootS2C(buf.readUUID(), buf.readVarInt(), buf.readLong(), buf.readFloat(), buf.readFloat(),
-                    buf.readFloat(), buf.readFloat(), buf.readVarInt());
+                    buf.readFloat(), buf.readFloat(), buf.readVarInt(), buf.readVarInt());
+                case COMBO -> new ComboS2C(buf.readVarInt(), buf.readLong(), buf.readFloat(), buf.readFloat(), buf.readFloat(),
+                    buf.readFloat(), buf.readVarInt());
                 case STYLE -> new StyleS2C(buf.readUUID(), Style.read(buf));
                 case CHARGE -> new ChargeS2C(buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean());
                 default -> null;

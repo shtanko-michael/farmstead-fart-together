@@ -1,0 +1,25 @@
+{
+  "parent": "farmstead_fart_together:first_toot",
+  "display": {
+    "icon": {
+      "id": "minecraft:note_block"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.together_2.title",
+      "fallback": "Fart Together!"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.together_2.description",
+      "fallback": "Toot at the same moment as a friend next to you"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

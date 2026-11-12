@@ -1,0 +1,25 @@
+{
+  "parent": "farmstead_fart_together:first_toot",
+  "display": {
+    "icon": {
+      "id": "minecraft:dragon_breath"
+    },
+    "title": {
+      "translate": "advancements.farmstead_fart_together.legendary_toot.title",
+      "fallback": "Legendary"
+    },
+    "description": {
+      "translate": "advancements.farmstead_fart_together.legendary_toot.description",
+      "fallback": "Hold the key until a full gas meter comes out at once"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}
