@@ -292,3 +292,11 @@ Modrinth API и поиск CurseForge по fart / flatulence / toot / gas / poop
 ## 13. Референсы
 
 `../references/eating-animation` (MIT — анимации еды), `not-enough-animations` и `first-person-model` (только изучать / MIT — поза в первом лице), `particle-rain` и `visuality` (MIT — частицы), `farmers-delight` (MIT — культуры, еда, датапаки), `simple-voice-chat` (ARR — только API).
+
+## 14. Состояние (12.11.2026)
+
+- Каркас из Footprints: точки входа трёх лоадеров, `[Farmstead] Fart Together … started` + проверка обновлений, клиентский конфиг `farmstead_fart_together-client.toml` с экраном настроек (вкладки General / Sounds / Cloud / About, пресеты `family` и `performance`, «Попробовать» — временное облачко из ванильных частиц `sneeze`), клиентская команда `/farttogether reload|config`, 12 языков (`tools/lang.py`, 32 ключа), TestHooks (+ `camera back|front|first`, `puff.player`), сцена `scenes/smoke.py`. Иконка — процедурная заглушка (`tools/gen_placeholder_icon.py`).
+- Сборка: все 22 цели.
+- В игре (`scene.py … smoke`): 1.20.1-forge, 1.21.1-neoforge, 1.21.1-fabric, 26.3-fabric — строка старта на клиенте и сервере, файл конфига, команда, облачко в виде от третьего лица, экран настроек; ошибок мода в логах нет.
+- Исправлено относительно Footprints: на 26.x `StringWidget` больше не центрирует текст — заголовок и подписи экрана настроек уезжали влево. Здесь ширина виджета = ширине текста. **В Footprints та же ошибка** (не трогали).
+- `farmstead-mod-tools/test-matrix/scene.py` ищет ошибки только по слову `footprints` — для других модов фильтр пустой; `scenes/smoke.py` проверяет логи сам.
